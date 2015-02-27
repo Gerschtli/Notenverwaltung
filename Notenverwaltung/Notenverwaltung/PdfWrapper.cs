@@ -22,10 +22,10 @@ namespace Notenverwaltung
 
         #region Variablen
 
-        private static XSize A4Size = PageSizeConverter.ToSize(PageSize.A4);
-        private static XSize A5Size = PageSizeConverter.ToSize(PageSize.A5);
+        private static XSize _A4Size = PageSizeConverter.ToSize(PageSize.A4);
+        private static XSize _A5Size = PageSizeConverter.ToSize(PageSize.A5);
 
-        private string tmpPath = @"C:\dummy\test\tmpFile.pdf"; // todo: tmpPath sinnvoll setzen
+        private string _tmpPath = @"C:\dummy\test\tmpFile.pdf"; // todo: tmpPath sinnvoll setzen
 
         #endregion
 
@@ -48,11 +48,11 @@ namespace Notenverwaltung
         {
             try
             {
-                MergeAndRotate(sourcePdfPaths, scale);
+                _MergeAndRotate(sourcePdfPaths, scale);
 
-                CombineAndScale(outputPdfPath, scale);
+                _CombineAndScale(outputPdfPath, scale);
 
-                File.Delete(tmpPath);
+                File.Delete(_tmpPath);
             }
             catch (Exception e)
             {
@@ -102,7 +102,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Gibt das entsprechende Element aus der Enumeration PageFormat zurück.
         /// </summary>
-        private PageFormat GetPageFormat(double width, double height)
+        private PageFormat _GetPageFormat(double width, double height)
         {
             /*
              * A4Portrait   -> height = a4.height, width = a4.width
@@ -111,13 +111,13 @@ namespace Notenverwaltung
              * A5Landscape  -> height = a5.width , width = a5.height
              */
 
-            if (height == A4Size.Height && width == A4Size.Width)
+            if (height == _A4Size.Height && width == _A4Size.Width)
                 return PageFormat.A4Portrait;
-            else if (height == A4Size.Width && width == A4Size.Height)
+            else if (height == _A4Size.Width && width == _A4Size.Height)
                 return PageFormat.A4Landscape;
-            else if (height == A5Size.Height && width == A5Size.Width)
+            else if (height == _A5Size.Height && width == _A5Size.Width)
                 return PageFormat.A5Portrait;
-            else if (height == A5Size.Width && width == A5Size.Height)
+            else if (height == _A5Size.Width && width == _A5Size.Height)
                 return PageFormat.A5Landscape;
 
             return PageFormat.Unknown;
@@ -126,7 +126,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Übernimmt das Zusammenfügen und Rotieren, je nach gewähltem Modus (scale).
         /// </summary>
-        private void MergeAndRotate(string[] sourcePdfPaths, bool scale)
+        private void _MergeAndRotate(string[] sourcePdfPaths, bool scale)
         {
             PdfDocument outputDocument = new PdfDocument();
             PdfDocument inputDocument;
@@ -140,7 +140,7 @@ namespace Notenverwaltung
                 for (int i = 0; i < inputDocument.PageCount; i++)
                 {
                     page = inputDocument.Pages[i];
-                    pf = GetPageFormat(page.Width, page.Height);
+                    pf = _GetPageFormat(page.Width, page.Height);
 
                     if (pf == PageFormat.Unknown)
                         continue;
@@ -157,15 +157,15 @@ namespace Notenverwaltung
                     outputDocument.AddPage(page);
                 }
             }
-            outputDocument.Save(tmpPath);
+            outputDocument.Save(_tmpPath);
         }
 
         /// <summary>
         /// Übernimmt das Kominieren von je zwei A5 Seiten zu einer A4 Seite und das Skalieren, je nach gewähltem Modus (scale).
         /// </summary>
-        private void CombineAndScale(string outputPdfPath, bool scale)
+        private void _CombineAndScale(string outputPdfPath, bool scale)
         {
-            XPdfForm form = XPdfForm.FromFile(tmpPath);
+            XPdfForm form = XPdfForm.FromFile(_tmpPath);
             XGraphics gfx;
             XRect rect;
             PdfPage page;
@@ -182,22 +182,22 @@ namespace Notenverwaltung
 
                 if (!scale)
                 {
-                    pf = GetPageFormat(form.PointWidth, form.PointHeight);
+                    pf = _GetPageFormat(form.PointWidth, form.PointHeight);
                     Console.WriteLine(pf);
 
                     if (pf == PageFormat.A5Landscape)
                     {
-                        rect = new XRect(0, 0, A4Size.Width, A4Size.Height / 2);
+                        rect = new XRect(0, 0, _A4Size.Width, _A4Size.Height / 2);
                         gfx.DrawImage(form, rect);
 
                         if (i + 1 < form.PageCount)
                         {
                             form.PageNumber = i + 2;
-                            pf = GetPageFormat(form.PointWidth, form.PointHeight);
+                            pf = _GetPageFormat(form.PointWidth, form.PointHeight);
 
                             if (pf == PageFormat.A5Landscape)
                             {
-                                rect = new XRect(0, A4Size.Height / 2, A4Size.Width, A4Size.Height / 2);
+                                rect = new XRect(0, _A4Size.Height / 2, _A4Size.Width, _A4Size.Height / 2);
                                 gfx.DrawImage(form, rect);
                                 i++;
                             }
@@ -207,7 +207,7 @@ namespace Notenverwaltung
                     }
                 }
 
-                rect = new XRect(0, 0, A4Size.Width, A4Size.Height);
+                rect = new XRect(0, 0, _A4Size.Width, _A4Size.Height);
 
                 gfx.DrawImage(form, rect);
             }
