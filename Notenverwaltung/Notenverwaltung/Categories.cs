@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Notenverwaltung
 {
@@ -9,12 +10,12 @@ namespace Notenverwaltung
     {
         private static string CategoriesPath = @"\Einstellungen\Kategorien.xml";
 
-        public string[] Names;
+        public List<string> Names;
 
         /// <summary>
         /// Lädt die Liste aller Kategorien.
         /// </summary>
-        public Categories()
+        public void Load()
         {
             Names = XmlHandler.GetObject<Categories>(Config.StoragePath + CategoriesPath).Names;
         }
