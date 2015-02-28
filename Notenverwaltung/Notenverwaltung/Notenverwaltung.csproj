@@ -58,8 +58,11 @@
     </ApplicationDefinition>
     <Compile Include="Categories.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Folder.cs" />
     <Compile Include="Instrument.cs" />
     <Compile Include="Instrumentation.cs" />
+    <Compile Include="Meta.cs" />
+    <Compile Include="NamePattern.cs" />
     <Compile Include="PdfWrapper.cs" />
     <Compile Include="XmlHandler.cs" />
     <Page Include="MainWindow.xaml">

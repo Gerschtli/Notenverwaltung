@@ -7,7 +7,7 @@ namespace Notenverwaltung
     /// </summary>
     public static class Config
     {
-        private static string ConfigPath = @"..\..\config.xml";
+        private static readonly string _Path = @"..\..\config.xml";
 
         private static string _StoragePath;
         public static string StoragePath
@@ -28,16 +28,16 @@ namespace Notenverwaltung
                     StoragePath = _StoragePath
                 };
 
-                XmlHandler.SaveObject(ConfigPath, config);
+                XmlHandler.SaveObject(_Path, config);
             }   
         }
 
         /// <summary>
-        /// Instanziert die Klassenvariablen.
+        /// Initialisiert die Klassenvariablen.
         /// </summary>
         private static void Initialize()
         {
-            StoragePath = XmlHandler.GetObject<ConfigSerializable>(ConfigPath).StoragePath;
+            StoragePath = XmlHandler.GetObject<ConfigSerializable>(_Path).StoragePath;
         }
     }
 

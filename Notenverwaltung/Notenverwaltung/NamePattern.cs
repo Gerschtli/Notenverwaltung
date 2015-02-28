@@ -1,25 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Notenverwaltung
 {
     /// <summary>
-    /// Klasse zum Editieren der in der Datei "Kategorien.xml" gespeicherten Kategorien, sowie zur Speicherung der zu einem Musikstück gehörigen Kategorien.
+    /// Verwaltet alle NamePatterns.
     /// </summary>
-    public class Categories
+    public class NamePattern
     {
-        public List<string> Names;
+        // todo: System zur Speicherung der NamePatterns entwickeln
+        //public List<string> Names;
 
-        #region Speicherung (alle Kategorien)
+        #region Speicherung
 
         private static readonly string _Path = @"\Einstellungen\Kategorien.xml";
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.
         /// </summary>
-        public static Categories Load()
+        public static NamePattern Load(string songFolder)
         {
-            return XmlHandler.GetObject<Categories>(Config.StoragePath + _Path);
+            return XmlHandler.GetObject<NamePattern>(Config.StoragePath + _Path);
         }
 
         /// <summary>
