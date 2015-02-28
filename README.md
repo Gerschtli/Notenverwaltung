@@ -29,6 +29,6 @@ Dieser Ordner ist wie folgt aufgebaut:
  - `Einstellungen`
     - `Besetzungen.xml`: Enthält z.B, Besetzungen von Großem Orchester, Jugendgruppe, Quintett
     - `Kategorien.xml`: Liste aller Kategorien
-    - `Mappe.xml`: Enthält Dictionaries mit Nummer und Musikstück für jede Mappe
+    - `Mappen.xml`: Enthält Dictionaries mit Nummer und Musikstück für jede Mappe
     - `NamePatterns.xml`: Enthält weitere Namepatterns für Ordner und PDFs
     - `Aufgaben.xml`: Speichert offene Aufgaben
