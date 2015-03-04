@@ -12,37 +12,28 @@ namespace Notenverwaltung
     /// Beschreibung:       Klasse für einen Watcher, der Verzeichnisse und Dateien überwacht
     /// ---------------------------------------------------------------------------
     ///    Änderungen:         Datum       Name        Änderung
+    ///                        März 2015   Tobias      Konstruktoren zusammengefasst; funktioniert nun auch bei mir.
     /// </summary>
-    public partial class Watcher : FileSystemWatcher
+    public class Watcher : FileSystemWatcher
     {
-        #region Konstruktor
-
         /// <summary>
         /// Standardkonstruktor zur Initialisierung der richtigen Einstellungen 
         /// </summary>
-        public Watcher()
-        {
-            this.IncludeSubdirectories = true; // Untersuchung der Unterverzeichnisse
-            this.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName; // Überwachungsaktionen definieren
-            this.Renamed += Watcher_Renamed;
-            this.Changed += Watcher_Changed;
-            this.Created += Watcher_Changed;
-            this.Deleted += Watcher_Changed;
-        }
-
-        /// <summary>
-        /// Überladung des Konstruktors mit Pfadangabe
-        /// </summary>
         /// <param name="path">Dateipfad zur Festlegung des Überwachungsbereichs</param>
         public Watcher(string path)
-            : base()
+            : base(path)
         {
-            this.Path = path; // todo: Prüfen der Pfadangaben? -> Fehlerbehandlung
+            IncludeSubdirectories = true; // Untersuchung der Unterverzeichnisse
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName; // Überwachungsaktionen definieren
+            Renamed += Watcher_Renamed;
+            Changed += Watcher_Changed;
+            Created += Watcher_Changed;
+            Deleted += Watcher_Changed;
+            EnableRaisingEvents = true;
         }
 
-        #endregion
 
-        #region öffentliche Funktionen
+        #region Öffentliche Funktionen
 
 
 
