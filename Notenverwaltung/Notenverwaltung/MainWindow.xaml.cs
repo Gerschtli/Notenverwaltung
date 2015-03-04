@@ -23,6 +23,43 @@ namespace Notenverwaltung
         public MainWindow()
         {
             InitializeComponent();
+
+            // ---------- Test von Objektcode: ----------
+            // *****Stimme - Equals*****
+            //Instrumentation besetzung = new Instrumentation { };
+            //besetzung.Instruments.Add(new Instrument() { Name = "Trompete", Num = 1, Tune = "Bb" });
+            //besetzung.Instruments.Add(new Instrument() { Name = "Trompete", Num = 2, Tune = "Bb" });
+            //besetzung.Instruments.Add(new Instrument() { Name = "Horn", Tune = "F" });
+            //besetzung.Instruments.Add(new Instrument() { Name = "Posaune", Tune = "C" });
+            //besetzung.Instruments.Add(new Instrument() { Name = "Tuba", Tune = "C" });
+            //Instrument x = new Instrument { Name = "Horn", Num = 1, Tune = "F" };
+            //Console.WriteLine("'" + x.ToString() + "' existiert: " + besetzung.Instruments.Contains(x));
+
+            // *****Besetzung - Differenz*****
+            //Instrumentation besetzung2 = new Instrumentation { };
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Trompete", Num = 1, Tune = "Bb" });
+            ////besetzung2.Instruments.Add(new Instrument() { Name = "Trompete", Num = 2, Tune = "Bb" });
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Horn", Tune = "F" });
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Posaune", Tune = "C" });
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Tuba", Tune = "C" });
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Susaphon"});
+
+            //List<Instrument> x = besetzung.GetMissingInstruments(besetzung2);
+            //List<Instrument> y = besetzung.GetNeedlessInstruments(besetzung2);
+
+            // ***** Folder - mission numbers  *****
+            //Folder f = new Folder();
+            //f.Order.Add(1, "x1");
+            //f.Order.Add(12, "x12");
+            //f.Order.Add(13, "x13");
+            //f.Order.Add(4, "x4");
+            //f.Order.Add(5, "x5");
+            //List<int> l =  f.getMissingNumbers(); 
+
+            // *****    *****
+
         }
+
+
     }
 }
