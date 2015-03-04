@@ -10,7 +10,7 @@ namespace Notenverwaltung
     {
         public string Name;
 
-        public Dictionary<int, string> Order; // todo: Überprüfen, ob Musikstück existiert
+        public Dictionary<int, string> Order = new Dictionary<int,string>(); // todo: Überprüfen, ob Musikstück existiert (Wertebereich i eingrenzen!)
 
         #region Speicherung
 
@@ -31,6 +31,35 @@ namespace Notenverwaltung
         {
             XmlHandler.SaveObject(Config.StoragePath + _Path, folders);
         }
+
+        #endregion
+
+        //todo: Berücksichtigung der Ausrichtung / Mehrere Musikstücke nebeneinander auf einer Seite oder mehrerer Seiten eines Musikstücks
+
+        #region "öffentliche Funktionen"
+        /// <summary>
+        /// ermittelt die fehlenden Nummern in der Auflistung
+        /// </summary>
+        /// <returns>sortierte Liste von Nummern</returns>   
+        public List<int> getMissingNumbers()
+            {
+                List<int> keyList = new List<int>(this.Order.Keys);
+                if (keyList.Count == 0) // wenn das Dictionary leer ist, nicht zurückgeben
+                {
+                    return null;
+                }
+                keyList.Sort();
+                List<int> missList = new List<int> ();
+                for (int i = 1; i <= keyList[keyList.Count - 1]; i++)
+                {
+                    if (keyList.Contains(i) == false)
+                    {
+                        missList.Add(i);
+                    }
+                }
+                return missList;
+            }
+
 
         #endregion
     }
