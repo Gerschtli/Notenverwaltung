@@ -56,7 +56,16 @@ namespace Notenverwaltung
             //f.Order.Add(5, "x5");
             //List<int> l =  f.getMissingNumbers(); 
 
-            // *****    *****
+            // ***** Song *****
+            //List<Song> list = Song.LoadAll();
+            //foreach (Song item in list)
+            //{
+            //    Console.WriteLine(item.Name);
+            //    foreach (Instrument inst in item.ExInstruments.Instruments)
+            //    {
+            //        Console.WriteLine("\t" + inst);
+            //    }
+            //}
 
         }
 

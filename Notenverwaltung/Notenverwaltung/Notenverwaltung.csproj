@@ -64,6 +64,7 @@
     <Compile Include="Meta.cs" />
     <Compile Include="NamePattern.cs" />
     <Compile Include="PdfWrapper.cs" />
+    <Compile Include="Song.cs" />
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>
