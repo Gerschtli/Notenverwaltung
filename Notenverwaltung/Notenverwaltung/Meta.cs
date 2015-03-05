@@ -6,7 +6,7 @@ namespace Notenverwaltung
     /// <summary>
     /// Enthält Metainformationen zu einem Musikstück.
     /// </summary>
-    public class Meta //UnresolvedMergeConflict: wieso bauen wir hier Metadaten, wenn wir bei Instrumenten die Objekte ausbilden?
+    public class Meta //UnresolvedMergeConflict: wieso bauen wir hier Metadaten, wenn wir bei Instrumenten die Objekte ausbilden? - Um die Meta-Daten als Objekt in der XML-Datei Meta.xml speichern können
     {
         public Categories Category;
 
