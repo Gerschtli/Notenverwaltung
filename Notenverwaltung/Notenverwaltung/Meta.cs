@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace Notenverwaltung
 {
@@ -18,12 +19,8 @@ namespace Notenverwaltung
 
         private static string _Path = @"\Musikstücke\{0}\Meta.xml";
 
-        private string _SongFolder; // Deklarierung als private, damit es nicht in der XML-Datei gespeichert wird.
-
-        public void SetSongFolder(string songFolder)
-        {
-            _SongFolder = songFolder;
-        }
+        [XmlIgnore]
+        public string SongFolder;
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.
@@ -31,7 +28,7 @@ namespace Notenverwaltung
         public static Meta Load(string songFolder)
         {
             Meta meta = XmlHandler.GetObject<Meta>(Config.StoragePath + String.Format(_Path, songFolder));
-            meta.SetSongFolder(songFolder);
+            meta.SongFolder = songFolder;
             return meta;
         }
 
@@ -40,7 +37,7 @@ namespace Notenverwaltung
         /// </summary>
         public void Save()
         {
-            XmlHandler.SaveObject(Config.StoragePath + String.Format(_Path, _SongFolder), this);
+            XmlHandler.SaveObject(Config.StoragePath + String.Format(_Path, SongFolder), this);
         }
 
         #endregion

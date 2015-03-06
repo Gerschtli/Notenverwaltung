@@ -22,7 +22,7 @@ namespace Notenverwaltung
             set
             {
                 _SongFolder = value;
-                MetaInfo.SetSongFolder(_SongFolder);
+                MetaInfo.SongFolder = _SongFolder;
             }
         }
 
