@@ -58,6 +58,7 @@
     </ApplicationDefinition>
     <Compile Include="Categories.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Folder.cs" />
     <Compile Include="Instrument.cs" />
     <Compile Include="Instrumentation.cs" />

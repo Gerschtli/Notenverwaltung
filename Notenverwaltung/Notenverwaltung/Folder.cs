@@ -10,7 +10,7 @@ namespace Notenverwaltung
     {
         public string Name;
 
-        public Dictionary<int, string> Order = new Dictionary<int,string>(); // todo: Überprüfen, ob Musikstück existiert (Wertebereich i eingrenzen!)
+        public SerializableDictionary<int, string> Order = new SerializableDictionary<int, string>(); // todo: Überprüfen, ob Musikstück existiert (Wertebereich i eingrenzen!)
 
         #region Speicherung
 
