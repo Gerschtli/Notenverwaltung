@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NamePatternSerializable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SongPatterns>
+    <string>^ (?&lt;Name&gt; [^&amp;]+) (&amp; (?&lt;Composer&gt; [^&amp;]+) (&amp; (?&lt;Arranger&gt; [^&amp;]+))? )? $</string>
+  </SongPatterns>
+  <InstrumentPatterns>
+    <string>^ (?&lt;Name&gt; [^&amp;]+) (&amp; (?&lt;Tune&gt; [^&amp;]+) (&amp; (?&lt;Num&gt; \d+))? )? $</string>
+  </InstrumentPatterns>
+</NamePatternSerializable>

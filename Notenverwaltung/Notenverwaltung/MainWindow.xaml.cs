@@ -67,8 +67,13 @@ namespace Notenverwaltung
             //    }
             //}
 
+            // ***** NamePatterns *****
+            //Console.WriteLine(NamePattern.NormalizeSong("Name&Komponist&Arrangeur"));
+            //Console.WriteLine(NamePattern.NormalizeInstrument("Name&Tune&Num"));
+            //Console.WriteLine(NamePattern.NormalizeInstrument("Name&Tune&5"));
+            //Console.WriteLine(NamePattern.NormalizeSong("Name&Komponist"));
+            //Console.WriteLine(NamePattern.NormalizeInstrument("Name"));
+
         }
-
-
     }
 }
