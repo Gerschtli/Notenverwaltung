@@ -12,7 +12,19 @@ namespace Notenverwaltung
 
         #region Instanzvariablen
 
-        public string SongFolder;
+        private string _SongFolder;
+        public string SongFolder
+        {
+            get
+            {
+                return _SongFolder;
+            }
+            set
+            {
+                _SongFolder = value;
+                MetaInfo.SetSongFolder(_SongFolder);
+            }
+        }
 
         public string Name;
 
@@ -36,7 +48,7 @@ namespace Notenverwaltung
         {
             if (IsValidFolder(songFolder) && Directory.Exists(Config.StoragePath + @"\Musikstücke\" + songFolder))
             {
-                SongFolder = songFolder;
+                _SongFolder = songFolder;
 
                 string[] result = songFolder.Split('#');
 

@@ -18,20 +18,29 @@ namespace Notenverwaltung
 
         private static string _Path = @"\Musikstücke\{0}\Meta.xml";
 
+        private string _SongFolder; // Deklarierung als private, damit es nicht in der XML-Datei gespeichert wird.
+
+        public void SetSongFolder(string songFolder)
+        {
+            _SongFolder = songFolder;
+        }
+
         /// <summary>
         /// Lädt das gespeicherte Objekt.
         /// </summary>
         public static Meta Load(string songFolder)
         {
-            return XmlHandler.GetObject<Meta>(Config.StoragePath + String.Format(_Path, songFolder));
+            Meta meta = XmlHandler.GetObject<Meta>(Config.StoragePath + String.Format(_Path, songFolder));
+            meta.SetSongFolder(songFolder);
+            return meta;
         }
 
         /// <summary>
         /// Speichert die aktuelle Instanz.
         /// </summary>
-        public void Save(string songFolder)
+        public void Save()
         {
-            XmlHandler.SaveObject(Config.StoragePath + String.Format(_Path, songFolder), this);
+            XmlHandler.SaveObject(Config.StoragePath + String.Format(_Path, _SongFolder), this);
         }
 
         #endregion
