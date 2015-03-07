@@ -15,8 +15,8 @@ namespace Notenverwaltung
         {
             try
             {
-                var serializer = new XmlSerializer(source.GetType());
-                var writer = new StreamWriter(path);
+                XmlSerializer serializer = new XmlSerializer(source.GetType());
+                StreamWriter writer = new StreamWriter(path);
                 serializer.Serialize(writer, source);
                 writer.Close();
             }
@@ -33,9 +33,9 @@ namespace Notenverwaltung
         {
             try
             {
-                var serializer = new XmlSerializer(typeof(TObject));
-                var reader = new StreamReader(path);
-                var obj = (TObject)serializer.Deserialize(reader);
+                XmlSerializer serializer = new XmlSerializer(typeof(TObject));
+                StreamReader reader = new StreamReader(path);
+                TObject obj = (TObject)serializer.Deserialize(reader);
                 reader.Close();
                 return obj;
             }
