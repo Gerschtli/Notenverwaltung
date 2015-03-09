@@ -74,6 +74,8 @@ namespace Notenverwaltung
             //Console.WriteLine(NamePattern.NormalizeSong("Name&Komponist"));
             //Console.WriteLine(NamePattern.NormalizeInstrument("Name"));
 
+            // ***** Watcher *****
+            //Watcher w = new Watcher(@"c:\temp\_x");
         }
     }
 }
