@@ -3,18 +3,14 @@ using System.IO;
 
 namespace Notenverwaltung
 {
-    /// Name:               Watcher
-    /// Version:            1.X
-    /// Erstelldatum:       Februar 2015
-    /// Verantwortliche(r): Martin Salfer
-    /// Umgebung:           Win 7 Prof SP 1; C#.NET 2012 (Framework 4.5)
-    /// Beschreibung:       Klasse für einen Watcher, der Verzeichnisse und Dateien überwacht
-    /// ---------------------------------------------------------------------------
-    ///    Änderungen:         Datum       Name        Änderung
-    ///                        März 2015   Tobias      Konstruktoren zusammengefasst; funktioniert nun auch bei mir.
-    /// </summary>
+ /// <summary>
+ /// abgeleitete FilesystemWachter-Klasse
+ /// </summary>
     public class Watcher : FileSystemWatcher
     {
+
+        public WorkList wl = WorkList.Load();
+
         /// <summary>
         /// Standardkonstruktor zur Initialisierung der richtigen Einstellungen 
         /// </summary>
@@ -45,23 +41,32 @@ namespace Notenverwaltung
         /// <summary>
         /// Event-Handler beim Umbenennen von Dateien und Verzeichnissen
         /// </summary>
-        private static void Watcher_Renamed(object sender, RenamedEventArgs e)
+        private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
             Console.WriteLine("{0} umbenannt in {1}", e.OldFullPath, e.FullPath);
+            wl.RenameDirOrFile(e.OldFullPath, e.FullPath);
         }
 
         /// <summary>
         /// Event-Handler beim Ändern von Dateien und Verzeichnissen
         /// </summary>
-        private static void Watcher_Changed(object sender, FileSystemEventArgs e)
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Console.WriteLine("Datei: " + e.FullPath + " | ChangeType: " + e.ChangeType);
+            switch (e.ChangeType)
+            {
+                case WatcherChangeTypes.Created:
+                    wl.NewDirOrFile(e.FullPath);
+                    break;
+                case WatcherChangeTypes.Deleted:
+                    wl.DelDirOrFile(e.FullPath);
+                    break;
+                //case WatcherChangeTypes.Changed // hier passiert überhaupt nichts
+            }
         }
 
         #endregion
 
-
-        //todo: Einfügen von (ein oder mehreren) PDF Dateien (-> File Watcher, Naming Patterns)
         //todo: was soll passieren, wenn der komplette Pfad gelöscht wird (das wird mit diesem Watcher nicht überprüft!)
     }
 }
