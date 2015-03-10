@@ -7,7 +7,7 @@ namespace Notenverwaltung
     /// Liste von Verzeichnissen und Dateien, die z.B. durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// Jeder Schritt wird direkt in die Worklist gespeichert um Informationsverlust zu verhindern.
     /// </summary>
-    public class WorkList
+    public class WorkList // UnresolvedMergeConflict: Wozu brauchen wir eine komplette Auflistung aller Elemente in unserem Dateisystem?
     {
         public List<string> loDirOrFiles = new List<string>(); // todo: nur lesend die Liste veröffentlichen?!
 
@@ -17,8 +17,11 @@ namespace Notenverwaltung
         /// <param name="DirOrFile">Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         public void NewDirOrFile(string DirOrFile)
         {
-            this.loDirOrFiles.Add(DirOrFile);
-            this.Save();
+            if (this.loDirOrFiles.Exists(x => string.Compare(x, DirOrFile, StringComparison.OrdinalIgnoreCase) != 0))
+            {
+                this.loDirOrFiles.Add(DirOrFile);
+                this.Save();
+            }
         }
 
         /// <summary>
