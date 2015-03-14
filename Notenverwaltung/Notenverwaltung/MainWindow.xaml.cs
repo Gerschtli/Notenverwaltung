@@ -54,14 +54,16 @@ namespace Notenverwaltung
             //f.Order.Add(13, "x13");
             //f.Order.Add(4, "x4");
             //f.Order.Add(5, "x5");
-            //List<int> l =  f.getMissingNumbers(); 
+            //List<int> l = f.GetMissingNumbers(); 
 
             // ***** Song *****
-            //List<Song> list = Song.LoadAll();
-            //foreach (Song item in list)
+            //List<string> list = Song.LoadAll();
+            //Song song;
+            //foreach (string item in list)
             //{
-            //    Console.WriteLine(item.Name);
-            //    foreach (Instrument inst in item.ExInstruments.Instruments)
+            //    song = new Song(item);
+            //    Console.WriteLine(song.Name);
+            //    foreach (Instrument inst in song.ExInstruments.Instruments)
             //    {
             //        Console.WriteLine("\t" + inst);
             //    }
@@ -75,7 +77,8 @@ namespace Notenverwaltung
             //Console.WriteLine(NamePattern.NormalizeInstrument("Name"));
 
             // ***** Watcher *****
-            Watcher w = new Watcher(@"C:\Users\Tobias\Documents\GitHub\Notenverwaltung\Externer Ordner");
+            //Watcher w = new Watcher(@"C:\Users\Tobias\Documents\GitHub\Notenverwaltung\Externer Ordner");
+
         }
     }
 }

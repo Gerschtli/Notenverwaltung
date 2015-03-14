@@ -12,7 +12,7 @@ namespace Notenverwaltung
 
         #region Speicherung (alle Kategorien)
 
-        private static readonly string _Path = @"\Einstellungen\Kategorien.xml";
+        private static readonly string _Path = @"Kategorien.xml";
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.

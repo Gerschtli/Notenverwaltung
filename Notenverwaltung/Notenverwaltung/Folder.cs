@@ -14,7 +14,7 @@ namespace Notenverwaltung
 
         #region Speicherung
 
-        private static readonly string _Path = @"\Einstellungen\Mappen.xml";
+        private static readonly string _Path = @"Mappen.xml";
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.
@@ -39,7 +39,7 @@ namespace Notenverwaltung
         /// ermittelt die fehlenden Nummern in der Auflistung
         /// </summary>
         /// <returns>sortierte Liste von Nummern</returns>   
-        public List<int> getMissingNumbers()
+        public List<int> GetMissingNumbers()
             {
                 List<int> keyList = new List<int>(this.Order.Keys);
                 if (keyList.Count == 0) // wenn das Dictionary leer ist, nicht zurückgeben

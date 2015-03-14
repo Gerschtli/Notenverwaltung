@@ -17,7 +17,7 @@ namespace Notenverwaltung
 
         #region Speicherung
 
-        private static string _Path = @"\Musikstücke\{0}\Meta.xml";
+        private static string _Path = @"{0}\Meta.xml";
 
         [XmlIgnore]
         public string SongFolder;

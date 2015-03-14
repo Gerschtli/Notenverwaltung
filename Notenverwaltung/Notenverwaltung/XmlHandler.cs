@@ -17,15 +17,16 @@ namespace Notenverwaltung
             {
                 XmlSerializer serializer = new XmlSerializer(source.GetType());
 
-                FileInfo fInfo = new FileInfo(path);
-                fInfo.IsReadOnly = false;
+                // Schreibschutz ist nicht nötig, da versteckt und sowieso nicht betriebssystemübergreifend
+                //FileInfo fInfo = new FileInfo(path);
+                //fInfo.IsReadOnly = false;
 
                 StreamWriter writer = new StreamWriter(path);
                 
                 serializer.Serialize(writer, source);
                 writer.Close();
 
-                fInfo.IsReadOnly = true;
+                //fInfo.IsReadOnly = true;
             }
             catch (Exception e)
             {

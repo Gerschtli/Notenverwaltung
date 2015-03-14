@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace Notenverwaltung
 {
+    // todo: Speichern des ABSOLUTEN Pfades nicht sinnvoll! relativ zum Root-Verzeichnis
+
     /// <summary>
     /// Liste von Verzeichnissen und Dateien, die z.B. durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// Jeder Schritt wird direkt in die Worklist gespeichert um Informationsverlust zu verhindern.
@@ -58,7 +60,7 @@ namespace Notenverwaltung
 
         #region Laden/Speichern
 
-        private static readonly string _Path = @"\Einstellungen\Worklist.xml";
+        private static readonly string _Path = @"Worklist.xml";
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.

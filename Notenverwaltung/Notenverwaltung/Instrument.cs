@@ -137,6 +137,9 @@ namespace Notenverwaltung
             if (!IsValidFilename(filename))
                 return null;
 
+            string[] split = filename.Split('\\');
+            filename = split[split.Length - 1];
+
             filename = filename.TrimEnd(".pdf".ToCharArray());
 
             string[] result = filename.Split('#');
@@ -166,6 +169,9 @@ namespace Notenverwaltung
         {
             if (filename == "")
                 return false;
+
+            string[] split = filename.Split('\\');
+            filename = split[split.Length - 1];
 
             filename = filename.TrimEnd(".pdf".ToCharArray());
 

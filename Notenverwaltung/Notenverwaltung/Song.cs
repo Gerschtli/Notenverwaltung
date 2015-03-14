@@ -46,11 +46,13 @@ namespace Notenverwaltung
         /// <param name="songFolder">Name des Ordners</param>
         public Song(string songFolder)
         {
-            if (IsValidFolder(songFolder) && Directory.Exists(Config.StoragePath + @"\Musikstücke\" + songFolder))
+            if (IsValidFolder(songFolder) && Directory.Exists(Config.StoragePath + songFolder))
             {
                 _SongFolder = songFolder;
 
-                string[] result = songFolder.Split('#');
+                string[] split = songFolder.Split('\\');
+
+                string[] result = split[split.Length - 1].Split('#');
 
                 switch (result.Length)
                 {
@@ -65,31 +67,19 @@ namespace Notenverwaltung
                         break;
                 }
 
-                // -------
-                // todo: Diese Daten bei Bedarf initialisieren oder direkt im Konstruktor?
                 MetaInfo = Meta.Load(songFolder);
 
-                try
-                {
-                    string[] files = Directory.GetFiles(Config.StoragePath + @"\Musikstücke\" + songFolder, "*.pdf");
 
-                    int count = (Config.StoragePath + @"\Musikstücke\" + songFolder).Split('\\').Length;
+                string[] files = Directory.GetFiles(Config.StoragePath + songFolder, "*.pdf");
 
-                    Array.ForEach<string>(files,
-                        (filename) =>
-                        {
-                            filename = filename.Split('\\')[count];
+                Array.ForEach<string>(files,
+                    (filename) =>
+                    {
+                        filename = filename.Replace(Config.StoragePath, "");
 
-                            if (Instrument.IsValidFilename(filename))
-                                ExInstruments.Instruments.Add(Instrument.GetInstrument(filename));
-                        });
-                }
-                catch (Exception e)
-                {
-                    // todo: Wie sollen die Exceptions behandelt werden?
-                    throw e;
-                }
-                // -------
+                        if (Instrument.IsValidFilename(filename))
+                            ExInstruments.Instruments.Add(Instrument.GetInstrument(filename));
+                    });
             }
             else
             {
@@ -104,21 +94,19 @@ namespace Notenverwaltung
         /// <summary>
         /// Gibt alle vorhandenen Musikstücke zurück (filtert Ordner mit invaliden Namen heraus)
         /// </summary>
-        public static List<Song> LoadAll() // todo: Pfad inklusive Liedordnername zurückgeben anstatt Instanz
+        public static List<string> LoadAll()
         {
-            string[] songFolders = Directory.GetDirectories(Config.StoragePath + @"\Musikstücke\");
+            List<string> songList = new List<string>();
 
-            List<Song> songList = new List<Song>();
+            string[] files = Directory.GetFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
 
-            int count = (Config.StoragePath + @"\Musikstücke").Split('\\').Length;
-
-            Array.ForEach<string>(songFolders,
-                (song) =>
+            Array.ForEach<string>(files,
+                (file) =>
                 {
-                    song = song.Split('\\')[count];
+                    file = file.Replace(Config.StoragePath, "").Replace(@"\Meta.xml", "");
 
-                    if (IsValidFolder(song))
-                        songList.Add(new Song(song));
+                    if (IsValidFolder(file))
+                        songList.Add(file);
                 });
 
             return songList;
@@ -129,6 +117,9 @@ namespace Notenverwaltung
         /// </summary>
         public static bool IsValidFolder(string songFolder)
         {
+            string[] split = songFolder.Split('\\');
+            songFolder = split[split.Length - 1];
+
             if (songFolder == "")
                 return false;
 

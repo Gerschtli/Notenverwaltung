@@ -14,7 +14,7 @@ namespace Notenverwaltung
 
         #region Klassenvariablen
 
-        private static readonly string _Path = @"\Einstellungen\NamePattern.xml";
+        private static readonly string _Path = @"NamePattern.xml";
 
         private static ObservableCollection<string> _SongPatterns;
         public static ObservableCollection<string> SongPatterns
@@ -77,6 +77,7 @@ namespace Notenverwaltung
         #endregion
 
         #region Normalisierung
+        // todo: Benutzer soll NamePattern auswählen
 
         /// <summary>
         /// Normalisiert den eingegebenen Namen mit den bekannten NamePatterns.
@@ -111,7 +112,7 @@ namespace Notenverwaltung
                     if (Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace))
                     {
                         return Regex.Replace(source, pattern, replace,
-                            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace).Trim(split);
+                            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace).TrimEnd(split);
                     }
                 }
                 catch

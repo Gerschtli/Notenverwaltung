@@ -14,7 +14,7 @@ namespace Notenverwaltung
         
         #region Speicherung
 
-        private static readonly string _Path = @"\Einstellungen\Besetzungen.xml";
+        private static readonly string _Path = @"Besetzungen.xml";
 
         /// <summary>
         /// Lädt das gespeicherte Objekt.
@@ -42,7 +42,7 @@ namespace Notenverwaltung
         /// <returns></returns>
         public List<Instrument> GetMissingInstruments(Instrumentation b)
         {
-            return compareInstrumentation(this.Instruments, b.Instruments);
+            return CompareInstrumentation(this.Instruments, b.Instruments);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Notenverwaltung
         /// <returns></returns>
         public List<Instrument> GetNeedlessInstruments(Instrumentation b)
         {
-            return compareInstrumentation(b.Instruments, this.Instruments);
+            return CompareInstrumentation(b.Instruments, this.Instruments);
         }
 
         #endregion
@@ -64,7 +64,7 @@ namespace Notenverwaltung
         /// <param name="a">Besetzungsliste a</param>
         /// <param name="b">Besetzungsliste b</param>
         /// <returns></returns>
-        private List<Instrument> compareInstrumentation(List<Instrument> a, List<Instrument> b)
+        private List<Instrument> CompareInstrumentation(List<Instrument> a, List<Instrument> b)
         {
             List<Instrument> loInstruments = new List<Instrument>();
 

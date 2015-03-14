@@ -21,7 +21,7 @@ namespace Notenverwaltung
             }
             set
             {
-                _StoragePath = value.TrimEnd('\\');
+                _StoragePath = value.TrimEnd('\\') + "\\"; // Sicherstellung, dass Pfad mit "\" endet.
 
                 var config = new ConfigSerializable()
                 {
