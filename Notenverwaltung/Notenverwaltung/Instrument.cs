@@ -132,7 +132,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Erzeugen einer Instanz zu vorliegendem Dateinamen (z.B. "Schlagzeug.pdf")
         /// </summary>
-        public static Instrument GetInstrument(string filename) // todo: Implementierung von anderen NamePatterns
+        public static Instrument GetInstrument(string filename)
         {
             if (!IsValidFilename(filename))
                 return null;

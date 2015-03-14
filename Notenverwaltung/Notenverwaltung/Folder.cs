@@ -10,7 +10,7 @@ namespace Notenverwaltung
     {
         public string Name;
 
-        public SerializableDictionary<int, string> Order = new SerializableDictionary<int, string>(); // todo: Überprüfen, ob Musikstück existiert (Wertebereich i eingrenzen!)
+        public SerializableDictionary<int, string> Order = new SerializableDictionary<int, string>();
 
         #region Speicherung
 
@@ -33,8 +33,6 @@ namespace Notenverwaltung
         }
 
         #endregion
-
-        //todo: Berücksichtigung der Ausrichtung / Mehrere Musikstücke nebeneinander auf einer Seite oder mehrerer Seiten eines Musikstücks
 
         #region "öffentliche Funktionen"
         /// <summary>

@@ -104,7 +104,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Gibt alle vorhandenen Musikstücke zurück (filtert Ordner mit invaliden Namen heraus)
         /// </summary>
-        public static List<Song> LoadAll() // als Song-Instanzen zurückgeben oder nur SongFolder Namen?
+        public static List<Song> LoadAll() // todo: Pfad inklusive Liedordnername zurückgeben anstatt Instanz
         {
             string[] songFolders = Directory.GetDirectories(Config.StoragePath + @"\Musikstücke\");
 

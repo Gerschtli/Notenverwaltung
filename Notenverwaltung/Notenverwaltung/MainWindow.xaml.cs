@@ -75,7 +75,7 @@ namespace Notenverwaltung
             //Console.WriteLine(NamePattern.NormalizeInstrument("Name"));
 
             // ***** Watcher *****
-            //Watcher w = new Watcher(@"c:\temp\_x");
+            Watcher w = new Watcher(@"C:\Users\Tobias\Documents\GitHub\Notenverwaltung\Externer Ordner");
         }
     }
 }

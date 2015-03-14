@@ -16,9 +16,16 @@ namespace Notenverwaltung
             try
             {
                 XmlSerializer serializer = new XmlSerializer(source.GetType());
+
+                FileInfo fInfo = new FileInfo(path);
+                fInfo.IsReadOnly = false;
+
                 StreamWriter writer = new StreamWriter(path);
+                
                 serializer.Serialize(writer, source);
                 writer.Close();
+
+                fInfo.IsReadOnly = true;
             }
             catch (Exception e)
             {

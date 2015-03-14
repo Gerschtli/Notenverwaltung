@@ -67,6 +67,5 @@ namespace Notenverwaltung
 
         #endregion
 
-        //todo: was soll passieren, wenn der komplette Pfad gelöscht wird (das wird mit diesem Watcher nicht überprüft!)
     }
 }

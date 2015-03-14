@@ -25,7 +25,7 @@ namespace Notenverwaltung
         private static XSize _A4Size = PageSizeConverter.ToSize(PageSize.A4);
         private static XSize _A5Size = PageSizeConverter.ToSize(PageSize.A5);
 
-        private string _tmpPath = @"C:\dummy\test\tmpFile.pdf"; // todo: tmpPath sinnvoll setzen
+        private string _tmpPath = Path.GetTempFileName();
 
         #endregion
 

@@ -7,9 +7,9 @@ namespace Notenverwaltung
     /// Liste von Verzeichnissen und Dateien, die z.B. durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// Jeder Schritt wird direkt in die Worklist gespeichert um Informationsverlust zu verhindern.
     /// </summary>
-    public class WorkList // UnresolvedMergeConflict: Wozu brauchen wir eine komplette Auflistung aller Elemente in unserem Dateisystem?
+    public class WorkList
     {
-        public List<string> loDirOrFiles = new List<string>(); // todo: nur lesend die Liste veröffentlichen?!
+        public List<string> loDirOrFiles = new List<string>();
 
         /// <summary>
         /// Neues Verzeichnis oder Datei zum bearbeiten eintragen
@@ -48,6 +48,7 @@ namespace Notenverwaltung
         {
             if (this.loDirOrFiles.Exists(x => string.Compare(x, oldDirOrFile, StringComparison.OrdinalIgnoreCase) == 0))
             {
+                // todo: Listeintrag überschreiben
                 loDirOrFiles.Remove(oldDirOrFile); //alten Eintrag löschen ...
                 this.loDirOrFiles.Add(newDirOrFile); //... und neuen Eintrag erstellen
             }
