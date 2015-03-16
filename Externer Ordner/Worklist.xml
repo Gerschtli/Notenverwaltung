@@ -1,2 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WorkList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+<WorkList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <loTasks>
+    <Task>
+      <Type>FileNamePattern</Type>
+      <Path>watcher\ghj\fds.txt</Path>
+    </Task>
+    <Task>
+      <Type>FileNamePattern</Type>
+      <Path>watcher\ghj\fds.rtf</Path>
+    </Task>
+  </loTasks>
+</WorkList>

@@ -66,6 +66,7 @@
     <Compile Include="NamePattern.cs" />
     <Compile Include="PdfWrapper.cs" />
     <Compile Include="Song.cs" />
+    <Compile Include="Task.cs" />
     <Compile Include="Watcher.cs">
       <SubType>Component</SubType>
     </Compile>

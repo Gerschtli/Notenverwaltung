@@ -43,8 +43,11 @@ namespace Notenverwaltung
         /// </summary>
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            Console.WriteLine("{0} umbenannt in {1}", e.OldFullPath, e.FullPath);
-            wl.RenameDirOrFile(e.OldFullPath, e.FullPath);
+            string oldName = e.OldFullPath.Replace(Path, "").TrimStart('\\');
+            Console.WriteLine("{0} umbenannt in {1}", oldName, e.Name);
+
+            bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+            wl.RenameDirOrFile(oldName, e.Name, dir);
         }
 
         /// <summary>
@@ -52,16 +55,20 @@ namespace Notenverwaltung
         /// </summary>
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Console.WriteLine("Datei: " + e.FullPath + " | ChangeType: " + e.ChangeType);
+            Console.WriteLine("Datei: " + e.Name + " | ChangeType: " + e.ChangeType);
+            bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+
             switch (e.ChangeType)
             {
                 case WatcherChangeTypes.Created:
-                    wl.NewDirOrFile(e.FullPath);
+                    wl.NewDirOrFile(e.Name, dir);
                     break;
                 case WatcherChangeTypes.Deleted:
-                    wl.DelDirOrFile(e.FullPath);
+                    wl.DelDirOrFile(e.Name, dir);
                     break;
-                //case WatcherChangeTypes.Changed // hier passiert überhaupt nichts
+                case WatcherChangeTypes.Changed:
+                    wl.ChangeDirOrFile(e.Name, dir);
+                    break;
             }
         }
 
