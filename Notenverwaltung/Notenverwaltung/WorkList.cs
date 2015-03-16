@@ -23,7 +23,7 @@ namespace Notenverwaltung
         {
             if (dir)
             {
-
+                // todo: Aktion bei Erstellung eines Verseichnisses
             }
             else
             {
@@ -50,26 +50,21 @@ namespace Notenverwaltung
         {
             if (dir)
             {
-
+                // todo: Aktion bei Umbennenung eines Verseichnisses
             }
             else
             {
                 if (oldPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) || newPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) // todo: Sinnvoll nach Dateiendung zu gehen?
                     return;
 
-                Task oldItem = new Task()
-                {
-                    Type = TaskType.FileNamePattern,
-                    Path = oldPath
-                };
-                Task newItem = new Task()
-                {
-                    Type = TaskType.FileNamePattern,
-                    Path = newPath
-                };
-
                 if (!ReplaceRefsWorkList(oldPath, newPath))
-                    loTasks.Add(newItem);
+                {
+                    loTasks.Add(new Task()
+                    {
+                        Type = TaskType.FileNamePattern,
+                        Path = newPath
+                    });
+                }
             }
 
             Save();
@@ -84,7 +79,7 @@ namespace Notenverwaltung
         {
             if (dir)
             {
-
+                // todo: Aktion bei Änderung des Inhalts eines Verseichnisses
                 Save();
             }
         }
@@ -98,7 +93,8 @@ namespace Notenverwaltung
         {
             if (dir)
             {
-
+                DeleteRefsWorkList(path);
+                DeleteRefsFolders(path);
                 Save();
             }
         }
