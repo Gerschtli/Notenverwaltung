@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 
@@ -50,9 +51,7 @@ namespace Notenverwaltung
             {
                 _SongFolder = songFolder;
 
-                string[] split = songFolder.Split('\\');
-
-                string[] result = split[split.Length - 1].Split('#');
+                string[] result = songFolder.Split('\\').Last().Split('#');
 
                 switch (result.Length)
                 {
@@ -117,8 +116,7 @@ namespace Notenverwaltung
         /// </summary>
         public static bool IsValidFolder(string songFolder)
         {
-            string[] split = songFolder.Split('\\');
-            songFolder = split[split.Length - 1];
+            songFolder = songFolder.Split('\\').Last();
 
             if (songFolder == "")
                 return false;

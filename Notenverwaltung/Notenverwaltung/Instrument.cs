@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Notenverwaltung
 {
@@ -137,10 +138,7 @@ namespace Notenverwaltung
             if (!IsValidFilename(filename))
                 return null;
 
-            string[] split = filename.Split('\\');
-            filename = split[split.Length - 1];
-
-            filename = filename.TrimEnd(".pdf".ToCharArray());
+            filename = filename.Split('\\').Last().Substring(0, filename.Length - 4);
 
             string[] result = filename.Split('#');
 
@@ -167,13 +165,10 @@ namespace Notenverwaltung
         /// </summary>
         public static bool IsValidFilename(string filename)
         {
-            if (filename == "")
+            if (filename == "" || !filename.EndsWith(".pdf"))
                 return false;
 
-            string[] split = filename.Split('\\');
-            filename = split[split.Length - 1];
-
-            filename = filename.TrimEnd(".pdf".ToCharArray());
+            filename = filename.Split('\\').Last().Substring(0, filename.Length - 4);
 
             string[] result = filename.Split('#');
 
