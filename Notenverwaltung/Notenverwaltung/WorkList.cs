@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 
 namespace Notenverwaltung
 {
@@ -61,7 +62,8 @@ namespace Notenverwaltung
         {
             if (dir)
             {
-                // todo: Aktion bei Umbennenung eines Verseichnisses
+                ReplaceRefsWorkList(oldPath, newPath);
+                ReplaceRefsFolders(oldPath, newPath);
             }
             else
             {
@@ -98,13 +100,29 @@ namespace Notenverwaltung
         /// <summary>
         /// Aktionen bei Änderung eines Verzeichnisses oder eines Dokuments.
         /// </summary>
-        /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
+        /// <param name="absPath">Absolute Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
+        /// <param name="relPath">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public static void ChangeDirOrFile(string path, bool dir)
+        public static void ChangeDirOrFile(string absPath, string relPath, bool dir)
         {
             if (dir)
             {
-                // todo: Aktion bei Änderung des Inhalts eines Verseichnisses
+                if (File.Exists(absPath + @"\Meta.xml"))
+                {
+                    Song song = new Song(relPath);
+                    Instrument value;
+
+                    for (int i = 0; i < song.MetaInfo.FallbackInstrumentation.Count; i++)
+                    {
+                        value = song.MetaInfo.FallbackInstrumentation.ElementAt(i).Value;
+
+                        if (!song.ExInstrumentation.Instruments.Exists(inst => inst == value))
+                        {
+                            song.MetaInfo.FallbackInstrumentation.Remove(song.MetaInfo.FallbackInstrumentation.ElementAt(i).Key);
+                        }
+                    }
+                    song.MetaInfo.Save();
+                }
             }
         }
 

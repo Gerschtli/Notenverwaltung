@@ -58,7 +58,7 @@ namespace Notenverwaltung
                     break;
                 case WatcherChangeTypes.Changed:
                     dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
-                    WorkList.ChangeDirOrFile(e.Name, dir);
+                    WorkList.ChangeDirOrFile(e.FullPath, e.Name, dir);
                     break;
             }
         }
