@@ -1,16 +1,28 @@
 ﻿using System;
 using System.Linq;
+using System.ComponentModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Notenverwaltung
 {
     /// <summary>
-    /// Liste von Verzeichnissen und Dateien, die z.B. durch den Watcher erkannt werden und abgearbeitet werden müssen.
-    /// Jeder Schritt wird direkt in die Worklist gespeichert um Informationsverlust zu verhindern.
+    /// Verwaltet die Liste von Aufgaben, die durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// </summary>
-    public class WorkList
+    public class WorkList : INotifyPropertyChanged
     {
-        public List<Task> loTasks = new List<Task>();
+        private static ObservableCollection<Task> _LoTasks;
+        public static ObservableCollection<Task> LoTasks
+        {
+            get
+            {
+                if (_LoTasks == null)
+                    Initialize();
+
+                return _LoTasks;
+            }
+        }
 
         #region Öffentliche Funktionen
 
@@ -19,7 +31,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public void NewDirOrFile(string path, bool dir)
+        public static void NewDirOrFile(string path, bool dir)
         {
             if (dir)
             {
@@ -27,17 +39,16 @@ namespace Notenverwaltung
             }
             else
             {
-                if (path.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) // todo: Sinnvoll nach Dateiendung zu gehen?
+                // todo: Wird für jede PDF ausgeführt, auch für PDFs, die als zusätzliche Datei gedacht sind; Überprüfung bei Abarbeitung?
+                if (!path.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                     return;
 
-                loTasks.Add(new Task()
+                LoTasks.Add(new Task()
                 {
                     Type = TaskType.FileNamePattern,
                     Path = path
                 });
             }
-
-            Save();
         }
 
         /// <summary>
@@ -46,7 +57,7 @@ namespace Notenverwaltung
         /// <param name="oldPath">alte relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         /// <param name="newPath">neue relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public void RenameDirOrFile(string oldPath, string newPath, bool dir)
+        public static void RenameDirOrFile(string oldPath, string newPath, bool dir)
         {
             if (dir)
             {
@@ -54,20 +65,34 @@ namespace Notenverwaltung
             }
             else
             {
-                if (oldPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase) || newPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) // todo: Sinnvoll nach Dateiendung zu gehen?
-                    return;
+                // todo: Wird für jede PDF ausgeführt, auch für PDFs, die als zusätzliche Datei gedacht sind; Überprüfung bei Abarbeitung?
+                bool isOldPdf = oldPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+                bool isNewPdf = newPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
 
-                if (!ReplaceRefsWorkList(oldPath, newPath))
+                if (isOldPdf && isNewPdf)
                 {
-                    loTasks.Add(new Task()
+                    if (!ReplaceRefsWorkList(oldPath, newPath))
+                    {
+                        LoTasks.Add(new Task()
+                        {
+                            Type = TaskType.FileNamePattern,
+                            Path = newPath
+                        });
+                    }
+                }
+                else if (isOldPdf && !isNewPdf)
+                {
+                    DeleteRefsWorkList(oldPath);
+                }
+                else if (!isOldPdf && isNewPdf)
+                {
+                    LoTasks.Add(new Task()
                     {
                         Type = TaskType.FileNamePattern,
                         Path = newPath
                     });
                 }
             }
-
-            Save();
         }
 
         /// <summary>
@@ -75,12 +100,11 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
         /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public void ChangeDirOrFile(string path, bool dir)
+        public static void ChangeDirOrFile(string path, bool dir)
         {
             if (dir)
             {
                 // todo: Aktion bei Änderung des Inhalts eines Verseichnisses
-                Save();
             }
         }
 
@@ -88,15 +112,10 @@ namespace Notenverwaltung
         /// Aktionen bei Löschung eines Verzeichnisses oder eines Dokuments.
         /// </summary>
         /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public void DelDirOrFile(string path, bool dir)
+        public static void DelDirOrFile(string path)
         {
-            if (dir)
-            {
-                DeleteRefsWorkList(path);
-                DeleteRefsFolders(path);
-                Save();
-            }
+            DeleteRefsWorkList(path);
+            DeleteRefsFolders(path);
         }
 
         #endregion
@@ -109,15 +128,15 @@ namespace Notenverwaltung
         /// <param name="oldItem">Altes zu ersetzendes Element</param>
         /// <param name="newItem">Neues Element</param>
         /// <returns>Gibt an, ob das alte Element vorhanden war</returns>
-        private bool ReplaceRefsWorkList(string oldPath, string newPath)
+        private static bool ReplaceRefsWorkList(string oldPath, string newPath)
         {
             bool ret = false;
 
-            for (int i = 0; i < loTasks.Count; i++)
+            for (int i = 0; i < LoTasks.Count; i++)
             {
-                if (loTasks[i].Path.StartsWith(oldPath))
+                if (LoTasks[i].Path.StartsWith(oldPath))
                 {
-                    loTasks[i].Path = newPath + loTasks[i].Path.Substring(oldPath.Length);
+                    LoTasks[i].Path = newPath + LoTasks[i].Path.Substring(oldPath.Length);
                     ret = true;
                 }
             }
@@ -129,9 +148,15 @@ namespace Notenverwaltung
         /// Löscht alle Aufgaben, die sich auf den genannten Pfad oder darunter liegende Elemente beziehen.
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
-        private void DeleteRefsWorkList(string path)
+        private static void DeleteRefsWorkList(string path)
         {
-            loTasks.RemoveAll(task => task.Path.StartsWith(path)); // todo: Nicht eindeutig! Bsp.: Ordner "bla/test" gelöscht -> würde auch "bla/test#text" löschen
+            for (int i = 0; i < LoTasks.Count; i++)
+            {
+                if (LoTasks[i].Path == path || LoTasks[i].Path.StartsWith(path + "\\"))
+                {
+                    LoTasks.RemoveAt(i);
+                }
+            }
         }
 
         /// <summary>
@@ -139,7 +164,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="oldPath">Alter zu ersetzender Pfad</param>
         /// <param name="newPath">Neuer Pfad</param>
-        private void ReplaceRefsFolders(string oldPath, string newPath)
+        private static void ReplaceRefsFolders(string oldPath, string newPath)
         {
             List<Folder> folders = Folder.Load();
 
@@ -159,7 +184,7 @@ namespace Notenverwaltung
         /// Löscht alle Einträge in Mappe.xml, die sich auf den genannten Pfad oder darunter liegende Elemente beziehen.
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
-        private void DeleteRefsFolders(string path)
+        private static void DeleteRefsFolders(string path)
         {
             List<Folder> folders = Folder.Load();
 
@@ -167,7 +192,7 @@ namespace Notenverwaltung
             {
                 for (int j = 0; j < folders[i].Order.Count; j++)
                 {
-                    if (folders[i].Order.ElementAt(j).Value.StartsWith(path)) // todo: Nicht eindeutig! Bsp.: Ordner "bla/test" gelöscht -> würde auch "bla/test#text" löschen
+                    if (folders[i].Order.ElementAt(j).Value == path || folders[i].Order.ElementAt(j).Value.StartsWith(path + "\\"))
                         folders[i].Order.Remove(folders[i].Order.ElementAt(j).Key);
                 }
             }
@@ -181,21 +206,25 @@ namespace Notenverwaltung
 
         private static readonly string _Path = @"Worklist.xml";
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
-        /// Lädt das gespeicherte Objekt.
+        /// Eventhandler, wenn die Liste verändert wird.
         /// </summary>
-        public static WorkList Load()
+        private static void LoTasks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            return XmlHandler.GetObject<WorkList>(Config.StoragePath + _Path);
+            XmlHandler.SaveObject(Config.StoragePath + _Path, LoTasks);
         }
 
         /// <summary>
-        /// Speichert die als Parameter angegebene Instanz.
+        /// Initialisiert die Klassenvariable.
         /// </summary>
-        public void Save()
+        private static void Initialize()
         {
-            XmlHandler.SaveObject(Config.StoragePath + _Path, this);
+            _LoTasks = XmlHandler.GetObject<ObservableCollection<Task>>(Config.StoragePath + _Path);
+            _LoTasks.CollectionChanged += LoTasks_CollectionChanged;
         }
+
         #endregion
     }
 }

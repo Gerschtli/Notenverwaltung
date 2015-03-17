@@ -1,16 +1,14 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace Notenverwaltung
 {
- /// <summary>
- /// abgeleitete FilesystemWachter-Klasse
- /// </summary>
+    /// <summary>
+    /// abgeleitete FilesystemWachter-Klasse
+    /// </summary>
     public class Watcher : FileSystemWatcher
     {
-
-        public WorkList wl = WorkList.Load();
-
         /// <summary>
         /// Standardkonstruktor zur Initialisierung der richtigen Einstellungen 
         /// </summary>
@@ -27,15 +25,6 @@ namespace Notenverwaltung
             this.EnableRaisingEvents = true;
         }
 
-
-        #region Öffentliche Funktionen
-
-
-
-
-
-        #endregion
-
         #region Event Handler
 
         /// <summary>
@@ -47,7 +36,7 @@ namespace Notenverwaltung
             Console.WriteLine("{0} umbenannt in {1}", oldName, e.Name);
 
             bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
-            wl.RenameDirOrFile(oldName, e.Name, dir);
+            WorkList.RenameDirOrFile(oldName, e.Name, dir);
         }
 
         /// <summary>
@@ -56,18 +45,20 @@ namespace Notenverwaltung
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             Console.WriteLine("Datei: " + e.Name + " | ChangeType: " + e.ChangeType);
-            bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+            bool dir;
 
             switch (e.ChangeType)
             {
                 case WatcherChangeTypes.Created:
-                    wl.NewDirOrFile(e.Name, dir);
+                    dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+                    WorkList.NewDirOrFile(e.Name, dir);
                     break;
                 case WatcherChangeTypes.Deleted:
-                    wl.DelDirOrFile(e.Name, dir);
+                    WorkList.DelDirOrFile(e.Name);
                     break;
                 case WatcherChangeTypes.Changed:
-                    wl.ChangeDirOrFile(e.Name, dir);
+                    dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+                    WorkList.ChangeDirOrFile(e.Name, dir);
                     break;
             }
         }
