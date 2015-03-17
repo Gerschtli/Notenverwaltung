@@ -35,7 +35,7 @@ namespace Notenverwaltung
 
         public Meta MetaInfo;
 
-        public Instrumentation ExInstruments = new Instrumentation();
+        public Instrumentation ExInstrumentation = new Instrumentation();
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace Notenverwaltung
                         filename = filename.Replace(Config.StoragePath, "");
 
                         if (Instrument.IsValidFilename(filename))
-                            ExInstruments.Instruments.Add(Instrument.GetInstrument(filename));
+                            ExInstrumentation.Instruments.Add(Instrument.GetInstrument(filename));
                     });
             }
             else

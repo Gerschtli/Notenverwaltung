@@ -138,7 +138,8 @@ namespace Notenverwaltung
             if (!IsValidFilename(filename))
                 return null;
 
-            filename = filename.Split('\\').Last().Substring(0, filename.Length - 4);
+            filename = filename.Split('\\').Last();
+            filename = filename.Substring(0, filename.Length - 4);
 
             string[] result = filename.Split('#');
 
@@ -168,7 +169,8 @@ namespace Notenverwaltung
             if (filename == "" || !filename.EndsWith(".pdf"))
                 return false;
 
-            filename = filename.Split('\\').Last().Substring(0, filename.Length - 4);
+            filename = filename.Split('\\').Last();
+            filename = filename.Substring(0, filename.Length - 4);
 
             string[] result = filename.Split('#');
 
