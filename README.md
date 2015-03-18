@@ -30,4 +30,4 @@ Dieser Ordner ist wie folgt aufgebaut:
  - `NamePatterns.xml`: Enthält weitere Namepatterns für Ordner und PDFs
  - `Worklist.xml`: Speichert offene Aufgaben
 
- Alle XML-Dateien werden versteckt.
+Alle XML-Dateien werden versteckt.
