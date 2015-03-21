@@ -12,9 +12,8 @@ namespace Notenverwaltung
         /// <summary>
         /// Standardkonstruktor zur Initialisierung der richtigen Einstellungen 
         /// </summary>
-        /// <param name="path">Dateipfad zur Festlegung des Überwachungsbereichs</param>
-        public Watcher(string path)
-            : base(path)
+        public Watcher()
+            : base(Config.StoragePath)
         {
             this.IncludeSubdirectories = true; // Untersuchung der Unterverzeichnisse
             this.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName; // Überwachungsaktionen definieren
