@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace Notenverwaltung
 {
-    static class XmlHandler
+    static class XmlHandler // todo: Einkommentieren, damit alle XML-Dateien versteckt werden.
     {
 
         /// <summary>
@@ -15,21 +15,20 @@ namespace Notenverwaltung
         {
             try
             {
+                //FileAttributes attributes = File.GetAttributes(path);
+                //File.SetAttributes(path, attributes & ~FileAttributes.Hidden);
+
                 XmlSerializer serializer = new XmlSerializer(source.GetType());
-
-                // Schreibschutz ist nicht nötig, da versteckt und sowieso nicht betriebssystemübergreifend
-                //FileInfo fInfo = new FileInfo(path);
-                //fInfo.IsReadOnly = false;
-
                 StreamWriter writer = new StreamWriter(path);
-                
                 serializer.Serialize(writer, source);
                 writer.Close();
 
-                //fInfo.IsReadOnly = true;
+                //if (!path.Contains("config"))
+                //    File.SetAttributes(path, attributes | FileAttributes.Hidden);
             }
             catch (Exception e)
             {
+                // todo: Message ändern
                 MessageBox.Show(e.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -41,14 +40,22 @@ namespace Notenverwaltung
         {
             try
             {
+                //FileAttributes attributes = File.GetAttributes(path);
+                //File.SetAttributes(path, attributes & ~FileAttributes.Hidden);
+
                 XmlSerializer serializer = new XmlSerializer(typeof(TObject));
                 StreamReader reader = new StreamReader(path);
                 TObject obj = (TObject)serializer.Deserialize(reader);
                 reader.Close();
+
+                //if (!path.Contains("config"))
+                //    File.SetAttributes(path, attributes | FileAttributes.Hidden);
+
                 return obj;
             }
             catch (Exception e)
             {
+                // todo: Message ändern
                 MessageBox.Show(e.Message, "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
                 return default(TObject);
             }
