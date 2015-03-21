@@ -1,2 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ArrayOfTask xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+<ArrayOfTask xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Task>
+    <Type>FolderNamePattern</Type>
+    <Path>Quintett</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Quintett\Relax in Brass\Horn#F.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Quintett\Relax in Brass\Percussion.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Quintett\Relax in Brass\Posaune#C#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Quintett\Relax in Brass\Trompete#Bb#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Quintett\Relax in Brass\Tuba#C#2.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FolderNamePattern</Type>
+    <Path>Quintett\Relax in Brass</Path>
+  </Task>
+  <Task>
+    <Type>FolderNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Direktion#C.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Horn#F.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Schlagzeug.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Trompete#Bb#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Trompete#C#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Tuba#C#2.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FolderNamePattern</Type>
+    <Path>Lied#Komponist#Arrangeur\Test#Bla</Path>
+  </Task>
+  <Task>
+    <Type>FolderNamePattern</Type>
+    <Path>Lottchen Polka</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lottchen Polka\Horn#F.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lottchen Polka\Percussion.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lottchen Polka\Posaune#C#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lottchen Polka\Trompete#Bb#1.pdf</Path>
+  </Task>
+  <Task>
+    <Type>FileNamePattern</Type>
+    <Path>Lottchen Polka\Tuba#C#2.pdf</Path>
+  </Task>
+</ArrayOfTask>

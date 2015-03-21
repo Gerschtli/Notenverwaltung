@@ -47,7 +47,9 @@ namespace Notenverwaltung
         /// <param name="songFolder">Name des Ordners</param>
         public Song(string songFolder)
         {
-            if (IsValidFolder(songFolder) && Directory.Exists(Config.StoragePath + songFolder))
+            WorkList.CheckFileSystem(songFolder);
+
+            if (IsValidFolder(songFolder) && File.Exists(Config.StoragePath + songFolder + @"\Meta.xml"))
             {
                 _SongFolder = songFolder;
 
@@ -82,7 +84,7 @@ namespace Notenverwaltung
             }
             else
             {
-                // todo: was passiert, wenn Ordner nicht vorhanden?
+                // todo: was passiert, wenn Ordner kein Liedordner nicht vorhanden?
             }
         }
 
@@ -95,6 +97,8 @@ namespace Notenverwaltung
         /// </summary>
         public static List<string> LoadAll()
         {
+            WorkList.CheckFileSystem();
+
             List<string> songList = new List<string>();
 
             string[] files = Directory.GetFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);

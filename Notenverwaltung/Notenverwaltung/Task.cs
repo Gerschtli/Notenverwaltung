@@ -12,7 +12,8 @@ namespace Notenverwaltung
     public enum TaskType
     {
         Default,
-        FileNamePattern
+        FileNamePattern,
+        FolderNamePattern
     }
 
     /// <summary>
