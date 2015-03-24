@@ -63,7 +63,7 @@ namespace Notenverwaltung
             //{
             //    song = new Song(item);
             //    Console.WriteLine(song.Name);
-            //    foreach (Instrument inst in song.ExInstruments.Instruments)
+            //    foreach (Instrument inst in song.ExInstrumentation.Instruments)
             //    {
             //        Console.WriteLine("\t" + inst);
             //    }
@@ -78,6 +78,15 @@ namespace Notenverwaltung
 
             // ***** Watcher *****
             //Watcher w = new Watcher();
+
+            // ***** WorkList *****
+            //List<string> list = new List<string>();
+            ////list.Add("Lied#Komponist#Arrangeur");
+            //////list.Add("Quintett");
+            //foreach (var item in WorkList.FilterList(list))
+            //{
+            //    Console.WriteLine(item.Type + ": " + item.Path);
+            //}
 
         }
     }

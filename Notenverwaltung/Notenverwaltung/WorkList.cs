@@ -169,13 +169,16 @@ namespace Notenverwaltung
         /// <summary>
         /// Gibt eine Liste mit allen zu bearbeitenden Aufgaben zurück und sortiert die Liste nach Typ und Verschachtelungstiefe.
         /// </summary>
-        public static List<Task> FilterList() // todo: Aufgabenliste auf angegebene Ordner beschränken
+        /// <param name="loSongFolders">Liste der Ordner, die überprüft werden sollen.</param>
+        public static List<Task> FilterList(List<string> loSongFolders)
         {
-            CheckFileSystem();
+            CheckFileSystem(loSongFolders);
 
             string path, filename;
             List<Task> filteredList = new List<Task>();
-            var sortedList = LoTasks.OrderByDescending(task => task.Type).ThenBy(task => task.Path.Split('\\').Length).ThenBy(task => task.Path);
+            var sortedList = from task in LoTasks
+                             orderby task.Type descending, task.Path.Split('\\').Length, task.Path
+                             select task;
 
             foreach (var item in sortedList)
             {
@@ -191,6 +194,9 @@ namespace Notenverwaltung
                     default:
                         continue;
                 }
+
+                if (loSongFolders.Count != 0 && !loSongFolders.Exists(folder => path.StartsWith(folder)))
+                    continue;
 
                 if (File.Exists(Config.StoragePath + path + "Meta.xml"))
                 {
