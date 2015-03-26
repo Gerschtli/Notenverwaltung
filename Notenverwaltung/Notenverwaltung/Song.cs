@@ -133,6 +133,21 @@ namespace Notenverwaltung
             return false;
         }
 
+        /// <summary>
+        /// Prüft, ob die benötigte Stimme vorhanden ist. Wenn nicht, wird die Ausweichstimme oder NULL zurückgegeben.
+        /// </summary>
+        /// <param name="inst">Benötigte Stimme</param>
+        /// <returns>Zu verwendende Stimme oder NULL</returns>
+        public Instrument GetInstrument(Instrument inst) {
+            if (ExInstrumentation.Instruments.Contains(inst))
+                return inst;
+
+            if (MetaInfo.FallbackInstrumentation.ContainsKey(inst))
+                return MetaInfo.FallbackInstrumentation[inst];
+
+            return null;
+        }
+
         #endregion
 
     }
