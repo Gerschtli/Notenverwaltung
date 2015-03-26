@@ -76,7 +76,7 @@ namespace Notenverwaltung
                 Array.ForEach<string>(files,
                     (filename) =>
                     {
-                        filename = filename.Replace(Config.StoragePath, "");
+                        filename = filename.Substring(Config.StoragePath.Length);
 
                         if (Instrument.IsValidFilename(filename))
                             ExInstrumentation.Instruments.Add(Instrument.GetInstrument(filename));
@@ -106,7 +106,7 @@ namespace Notenverwaltung
             Array.ForEach<string>(files,
                 (file) =>
                 {
-                    file = file.Replace(Config.StoragePath, "").Replace(@"\Meta.xml", "");
+                    file = file.Substring(Config.StoragePath.Length, file.Length - Config.StoragePath.Length - 9); // 9 = @"\Meta.xml".Length
 
                     if (IsValidFolder(file))
                         songList.Add(file);

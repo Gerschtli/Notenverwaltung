@@ -31,7 +31,7 @@ namespace Notenverwaltung
         /// </summary>
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            string oldName = e.OldFullPath.Replace(Path, "").TrimStart('\\');
+            string oldName = e.OldFullPath.Substring(Path.Length).TrimStart('\\');
             Console.WriteLine("{0} umbenannt in {1}", oldName, e.Name);
 
             bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
