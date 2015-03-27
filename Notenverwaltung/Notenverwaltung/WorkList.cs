@@ -12,7 +12,7 @@ namespace Notenverwaltung
     /// <summary>
     /// Verwaltet die Liste von Aufgaben, die durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// </summary>
-    public class WorkList : INotifyPropertyChanged
+    public static class WorkList
     {
         private static ObservableCollection<Task> _LoTasks;
         public static ObservableCollection<Task> LoTasks
@@ -463,8 +463,6 @@ namespace Notenverwaltung
         #region Laden/Speichern
 
         private static readonly string _Path = @"Worklist.xml";
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Eventhandler, wenn die Liste verändert wird.

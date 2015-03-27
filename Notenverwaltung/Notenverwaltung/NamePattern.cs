@@ -9,7 +9,7 @@ namespace Notenverwaltung
     /// <summary>
     /// Statische Klasse zum Verwalten aller NamePatterns.
     /// </summary>
-    public class NamePattern : INotifyPropertyChanged 
+    public static class NamePattern
     {
 
         #region Klassenvariablen
@@ -57,8 +57,6 @@ namespace Notenverwaltung
         }
 
         #region Eventhandler
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Eventhandler, wenn die Listen verändert werden.
