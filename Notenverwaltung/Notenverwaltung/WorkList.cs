@@ -215,32 +215,10 @@ namespace Notenverwaltung
         /// <param name="loSongFolders">Liste der Ordner, die überprüft werden sollen.</param>
         public static void CheckFileSystem(List<string> loSongFolders)
         {
-            var allMetas = Directory.EnumerateFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
-            var allPdfs = Directory.EnumerateFiles(Config.StoragePath, "*.pdf", SearchOption.AllDirectories).OrderByDescending(path => path.Split('\\').Length);
+            List<string> needMeta = NeedMetaList();
 
-            List<string> needMeta = new List<string>();
-            List<string> delMeta = new List<string>();
-            string songFolder;
+            List<string> delMeta = DelMetaList(needMeta);
 
-            foreach (string path in allPdfs) // Pfade, die potentielle Liedordner sind, in needMeta speichern
-            {
-                songFolder = path.Substring(Config.StoragePath.Length, path.Length - Config.StoragePath.Length - path.Split('\\').Last().Length).Trim('\\');
-
-                needMeta.RemoveAll(name => name.StartsWith(songFolder + '\\'));
-                if (!needMeta.Contains(songFolder))
-                    needMeta.Add(songFolder);
-            }
-
-            if (needMeta.Exists(name => name == "")) // Root Verzeichnis ist nie Liedordner, daher löschen
-                ConfirmDelMeta("");
-
-            foreach (string path in allMetas)
-            {
-                songFolder = path.Substring(Config.StoragePath.Length, path.Length - Config.StoragePath.Length - path.Split('\\').Last().Length).Trim('\\');
-
-                if (needMeta.RemoveAll(name => name == songFolder) == 0) // Vorhandene Meta.xml aus needMeta löschen
-                    delMeta.Add(songFolder);
-            }
 
             // Operationen auf angegebene Liedordner beschränken
             loSongFolders.ForEach(folder =>
@@ -258,6 +236,8 @@ namespace Notenverwaltung
             });
 
             // Meta.xmls löschen
+            if (delMeta.Remove(""))
+                DeleteFile(Config.StoragePath + @"\Meta.xml");
             delMeta.ForEach(path => ConfirmDelMeta(path));
         }
 
@@ -368,8 +348,6 @@ namespace Notenverwaltung
         {
             /* Fenster für User:
              * Mögliche Problemursachen:
-             * - PDFs oder Meta.xml in Root
-             *   -> User informieren, dann PDFs und Meta.xml löschen
              * - Meta.xml(1) liegt über Meta.xml(2)
              *   -> User fragen, ob Ordner von (2) Liedordner ist, wenn ja (1) und deren PDFs löschen, wenn nein (2) löschen
              *      Die Namen aller zu löschenden PDFs anzeigen.
@@ -377,58 +355,24 @@ namespace Notenverwaltung
              * - Meta.xml hat keine PDFs auf gleicher Ebene
              *   -> User fragen, ob Ordner Liedordner ist, wenn ja nichts tun, wenn nein Meta.xml löschen
              */
-            string[] split = folder.Split('\\');
-            string path;
+            string metaPath;
+            List<string> pdfs = InvalidPdfs(folder, out metaPath);
 
-            string metaPath = "";
-            List<string> pdfs = new List<string>();
 
-            for (int i = 0; i < split.Length; i++) // Liste der Dateien erstellen, welche gelöscht werden müssten
-            {
-                path = "";
-                for (int j = 0; j < i; j++)
-                    path += split[j] + "\\";
-
-                if (metaPath == "" && File.Exists(Config.StoragePath + path + "Meta.xml"))
-                    metaPath = path + "Meta.xml";
-
-                if (metaPath != "" || (metaPath == "" && path == ""))
-                {
-                    foreach (string item in Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"))
-                        pdfs.Add(item.Substring(Config.StoragePath.Length));
-                }
-            }
-
-            string message, pdfText = "";
-            MessageBoxResult result;
+            string pdfText = "";
 
             pdfs.ForEach(name => pdfText += "\n      - " + name); // Liste formatieren für MessageBox
 
-            if (folder == "") // Das Root-Verzeichnis stellt nie einen Liedordner dar
+
+            string message = "Es ist ein Problem aufgetreten. Ist in folgendem Ordner ein Lied gespeichert?\n\n      " + folder; // 2.Fall
+
+            if (pdfs.Count != 0) // 1.Fall
             {
-                if (pdfs.Count != 0)
-                {
-                    message = "Es ist ein Problem aufgetreten. Folgende PDF-Dateien müssen gelöscht werden:\n"
-                        + pdfText + "\n\nWenn Sie das Fenster schließen, werden die genannten Dateien gelöscht, sofern sie noch vorhanden sind.";
-
-                    MessageBox.Show(message, "Problem im Dateisystem", MessageBoxButton.OK, MessageBoxImage.Warning);
-
-                }
-
-                result = MessageBoxResult.Yes;
+                message += "\n\nWenn dies der Fall ist, müssen folgende PDF-Dateien entweder gelöscht werden oder aus dem Dateisystem entfernt werden:\n"
+                    + pdfText + "\n\nWenn Sie auf \"Ja\" drücken, werden die genannten Dateien gelöscht, sofern sie noch vorhanden sind.";
             }
-            else
-            {
-                message = "Es ist ein Problem aufgetreten. Ist in folgendem Ordner ein Lied gespeichert?\n\n      " + folder; // 2.Fall
 
-                if (pdfs.Count != 0) // 1.Fall
-                {
-                    message += "\n\nWenn dies der Fall ist, müssen folgende PDF-Dateien entweder gelöscht werden oder aus dem Dateisystem entfernt werden:\n"
-                        + pdfText + "\n\nWenn Sie auf \"Ja\" drücken, werden die genannten Dateien gelöscht, sofern sie noch vorhanden sind.";
-                }
-
-                result = MessageBox.Show(message, "Problem im Dateisystem", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            }
+            MessageBoxResult result = MessageBox.Show(message, "Problem im Dateisystem", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             switch (result)
             {
@@ -440,6 +384,37 @@ namespace Notenverwaltung
                     pdfs.ForEach(name => DeleteFile(Config.StoragePath + name));
                     break;
             }
+        }
+
+        /// <summary>
+        /// Generiert eine Liste von PDFs relativ zum Speicherpfad der Notenverwaltung, die dort nicht liegen dürfen, wenn "folder" ein Liedordner ist.
+        /// </summary>
+        /// <param name="folder">Potentieller Liedordner</param>
+        /// <param name="metaPath">Pfad zur ersten Meta.xml Datei</param>
+        private static List<string> InvalidPdfs(string folder, out string metaPath)
+        {
+            string[] split = folder.Split('\\');
+            string path;
+
+            metaPath = null;
+            List<string> pdfs = new List<string>();
+
+            for (int i = 1; i < split.Length; i++) // Liste der Dateien erstellen, welche gelöscht werden müssten
+            {
+                path = "";
+                for (int j = 0; j < i; j++)
+                    path += split[j] + "\\";
+
+                if (metaPath != null)
+                {
+                    foreach (string item in Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"))
+                        pdfs.Add(item.Substring(Config.StoragePath.Length));
+                }
+                else if (File.Exists(Config.StoragePath + path + "Meta.xml"))
+                    metaPath = path + "Meta.xml";
+            }
+
+            return pdfs;
         }
 
         /// <summary>
@@ -456,6 +431,52 @@ namespace Notenverwaltung
             {
                 return;
             }
+        }
+
+        /// <summary>
+        /// Generiert eine Liste von Ordnernamen relativ zum Speicherpfad der Notenverwaltung, welche PDFs enthalten und nach der Definition eines Liedordners eine Meta.xml brauchen.
+        /// </summary>
+        private static List<string> NeedMetaList()
+        {
+            var allPdfs = from file in Directory.EnumerateFiles(Config.StoragePath, "*.pdf", SearchOption.AllDirectories)
+                          where file.Split('\\').Length > Config.StoragePath.Split('\\').Length
+                          orderby file.Split('\\').Length descending
+                          select file;
+
+            List<string> needMeta = new List<string>();
+            string songFolder;
+
+            foreach (string path in allPdfs) // Pfade, die potentielle Liedordner sind, in needMeta speichern
+            {
+                songFolder = path.Substring(Config.StoragePath.Length, path.Length - Config.StoragePath.Length - path.Split('\\').Last().Length).Trim('\\');
+
+                needMeta.RemoveAll(name => name.StartsWith(songFolder + '\\'));
+                if (!needMeta.Contains(songFolder))
+                    needMeta.Add(songFolder);
+            }
+            return needMeta;
+        }
+
+        /// <summary>
+        /// Generiert eine Liste von Ordnernamen relativ zum Speicherpfad der Notenverwaltung, welche eine Meta.xml enthalten, jedoch aufgrund der Dateistruktur keine Liedordner sein können.
+        /// </summary>
+        /// <param name="needMeta">Liste von Ordnernamen; wird manipuliert, um vorhandene Liedordner aus Liste zu löschen.</param>
+        private static List<string> DelMetaList(List<string> needMeta)
+        {
+            var allMetas = Directory.EnumerateFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
+
+            List<string> delMeta = new List<string>();
+            string songFolder;
+
+            foreach (string path in allMetas)
+            {
+                songFolder = path.Substring(Config.StoragePath.Length, path.Length - Config.StoragePath.Length - path.Split('\\').Last().Length).Trim('\\');
+
+                if (needMeta.RemoveAll(name => name == songFolder) == 0) // Vorhandene Meta.xml aus needMeta löschen
+                    delMeta.Add(songFolder);
+            }
+
+            return delMeta;
         }
 
         #endregion
