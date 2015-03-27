@@ -405,13 +405,15 @@ namespace Notenverwaltung
                 for (int j = 0; j < i; j++)
                     path += split[j] + "\\";
 
+
+                if (metaPath == null && File.Exists(Config.StoragePath + path + "Meta.xml"))
+                    metaPath = path + "Meta.xml";
+
                 if (metaPath != null)
                 {
                     foreach (string item in Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"))
                         pdfs.Add(item.Substring(Config.StoragePath.Length));
                 }
-                else if (File.Exists(Config.StoragePath + path + "Meta.xml"))
-                    metaPath = path + "Meta.xml";
             }
 
             return pdfs;
