@@ -14,115 +14,124 @@ namespace Notenverwaltung
     /// </summary>
     public static class WorkList
     {
-        private static ObservableCollection<Task> _LoTasks;
-        public static ObservableCollection<Task> LoTasks
-        {
-            get
-            {
-                if (_LoTasks == null)
-                    Initialize();
-
-                return _LoTasks;
-            }
-        }
+        // Diese Liste sollte nicht von außerhalb der Klasse verändert werden.
+        public static List<Task> LoTasks = new List<Task>();
 
         #region Öffentliche Funktionen
 
         /// <summary>
-        /// Aktionen bei Erstellung eines neuen Verzeichnisses oder eines neuen Dokuments.
+        /// Wird zur Initialisierung der Aufgabenliste und vor der Instanzierung des Watchers aufgerufen.
         /// </summary>
-        /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
+        public static void Initialize()
+        {
+            CheckFileSystem();
+
+            List<string> loSongFolders = Song.LoadAll();
+            string newName;
+
+            foreach (string songFolder in loSongFolders)
+            {
+                newName = NormalizeFolder(songFolder);
+
+                foreach (string file in Directory.EnumerateFiles(Config.StoragePath + newName, "*.pdf"))
+                {
+                    NormalizeFile(file.Substring(Config.StoragePath.Length));
+                }
+            }
+
+            List<Folder> loFolders = Folder.Load();
+
+            foreach (Folder folder in loFolders)
+            {
+                folder.CheckSongs(); // todo: Problematisch, da eine Liedordnerumbenennung, während das Programm nicht geöffnet ist, dazu führt, dass dieser Eintrag gelöscht wird.
+            }
+
+            Folder.Save(loFolders);
+        }
+
+        /// <summary>
+        /// Aktionen bei Erstellung einer PDF-Datei oder eines Verzeichnisses.
+        /// </summary>
+        /// <param name="path">relative Pfadangabe einer Datei oder eines Verzeichnisses</param>
         public static void NewDirOrFile(string path, bool dir)
         {
             if (dir)
             {
-                // remark: Wird für jeden Ordner ausgeführt, auch für Strukturordner und Ordner für zusätzliche Dateien; Überprüfung bei Abarbeitung?
-                LoTasks.Add(new Task()
+                CheckFileSystem(path);
+
+                if (File.Exists(Config.StoragePath + path + @"\Meta.xml"))
                 {
-                    Type = TaskType.FolderNamePattern,
-                    Path = path
-                });
+                    NormalizeFolder(path);
 
-                // Wenn ein Ordner mit Dateien eingefügt wird, müssen diese auch in die Worklist eingetragen werden
-                var pdfs = Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf", SearchOption.AllDirectories);
-                var dirs = Directory.EnumerateDirectories(Config.StoragePath + path, "*", SearchOption.AllDirectories);
-
-                foreach (string pdfPath in pdfs)
-                    NewDirOrFile(pdfPath.Substring(Config.StoragePath.Length), false);
-
-                foreach (string dirPath in dirs)
-                {
-                    LoTasks.Add(new Task()
+                    foreach (string file in Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"))
                     {
-                        Type = TaskType.FolderNamePattern,
-                        Path = dirPath.Substring(Config.StoragePath.Length)
-                    });
+                        NormalizeFile(file.Substring(Config.StoragePath.Length));
+                    }
+                }
+                else
+                {
+                    // Für den Fall, dass ein Ordner mit Inhalt hinzugefügt wird, muss dessen Inhalt manuell gescannt werden
+                    foreach (string folder in Directory.EnumerateDirectories(Config.StoragePath + path, "*", SearchOption.AllDirectories))
+                    {
+                        if (File.Exists(folder + @"\Meta.xml"))
+                        {
+                            NormalizeFolder(folder.Substring(Config.StoragePath.Length));
+
+                            foreach (string file in Directory.EnumerateFiles(folder, "*.pdf"))
+                            {
+                                NormalizeFile(file.Substring(Config.StoragePath.Length));
+                            }
+
+                            break;
+                        }
+                    }
                 }
             }
-            else
+            else if (path.ToLower().EndsWith(".pdf"))
             {
-                // remark: Wird für jede PDF ausgeführt, auch für PDFs, die als zusätzliche Datei gedacht sind; Überprüfung bei Abarbeitung?
-                if (!path.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-                    return;
+                string filename = path.Split('\\').Last();
 
-                LoTasks.Add(new Task()
-                {
-                    Type = TaskType.FileNamePattern,
-                    Path = path
-                });
+                CheckFileSystem(path.Substring(0, path.Length - filename.Length - 1));
+
+                NormalizeFile(path);
             }
         }
 
         /// <summary>
-        /// Aktionen bei Umbenennung eines Verzeichnisses oder eines Dokuments.
+        /// Aktionen bei Umbenennung eines Verzeichnisses oder einer Datei.
         /// </summary>
-        /// <param name="oldPath">alte relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="newPath">neue relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
+        /// <param name="oldPath">alte relative Pfadangabe eines Verzeichnisses oder einer Datei</param>
+        /// <param name="newPath">neue relative Pfadangabe eines Verzeichnisses oder einer Datei</param>
         public static void RenameDirOrFile(string oldPath, string newPath, bool dir)
         {
             if (dir)
             {
-                if (!ReplaceRefsWorkList(oldPath, newPath))
-                {
-                    // remark: Wird für jeden Ordner ausgeführt, auch für Strukturordner und Ordner für zusätzliche Dateien; Überprüfung bei Abarbeitung?
-                    LoTasks.Add(new Task()
-                    {
-                        Type = TaskType.FolderNamePattern,
-                        Path = newPath
-                    });
-                }
+                DeleteRefsWorkList(oldPath, true);
+
+                if (File.Exists(Config.StoragePath + newPath + @"\Meta.xml"))
+                    newPath = NormalizeFolder(newPath);
+
+                ReplaceRefsWorkList(oldPath, newPath);
                 ReplaceRefsFolders(oldPath, newPath);
             }
             else
             {
-                // remark: Wird für jede PDF ausgeführt, auch für PDFs, die als zusätzliche Datei gedacht sind; Überprüfung bei Abarbeitung?
-                bool isOldPdf = oldPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
-                bool isNewPdf = newPath.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase);
+                bool oldIsPdf = oldPath.ToLower().EndsWith(".pdf");
+                bool newIsPdf = newPath.ToLower().EndsWith(".pdf");
 
-                if (isOldPdf && isNewPdf)
-                {
-                    if (!ReplaceRefsWorkList(oldPath, newPath))
-                    {
-                        LoTasks.Add(new Task()
-                        {
-                            Type = TaskType.FileNamePattern,
-                            Path = newPath
-                        });
-                    }
-                }
-                else if (isOldPdf && !isNewPdf)
-                {
+                if (oldIsPdf)
                     DeleteRefsWorkList(oldPath);
-                }
-                else if (!isOldPdf && isNewPdf)
+
+                if (newIsPdf)
                 {
-                    LoTasks.Add(new Task()
+                    newPath = NormalizeFile(newPath);
+
+                    if (!oldIsPdf)
                     {
-                        Type = TaskType.FileNamePattern,
-                        Path = newPath
-                    });
+                        string filename = newPath.Split('\\').Last();
+
+                        CheckFileSystem(newPath.Substring(0, newPath.Length - filename.Length - 1));
+                    }
                 }
             }
         }
@@ -130,36 +139,41 @@ namespace Notenverwaltung
         /// <summary>
         /// Aktionen bei Änderung eines Verzeichnisses oder eines Dokuments.
         /// </summary>
-        /// <param name="absPath">Absolute Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="relPath">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
-        /// <param name="dir">Wahr, falls Element ein Verzeichnis ist</param>
-        public static void ChangeDirOrFile(string absPath, string relPath, bool dir)
+        /// <param name="path">Relative Pfadangabe eines Verzeichnisses</param>
+        public static void ChangeDir(string path)
         {
-            if (dir)
+            if (File.Exists(path + @"\Meta.xml"))
             {
-                if (File.Exists(absPath + @"\Meta.xml"))
+                Song song = new Song(path);
+                Instrument value;
+
+                for (int i = song.MetaInfo.FallbackInstrumentation.Count - 1; i >= 0; i--)
                 {
-                    Song song = new Song(relPath);
-                    Instrument value;
+                    value = song.MetaInfo.FallbackInstrumentation.ElementAt(i).Value;
 
-                    for (int i = 0; i < song.MetaInfo.FallbackInstrumentation.Count; i++)
+                    if (!song.ExInstrumentation.Instruments.Exists(inst => inst == value))
                     {
-                        value = song.MetaInfo.FallbackInstrumentation.ElementAt(i).Value;
-
-                        if (!song.ExInstrumentation.Instruments.Exists(inst => inst == value))
-                        {
-                            song.MetaInfo.FallbackInstrumentation.Remove(song.MetaInfo.FallbackInstrumentation.ElementAt(i).Key);
-                        }
+                        song.MetaInfo.FallbackInstrumentation.Remove(song.MetaInfo.FallbackInstrumentation.ElementAt(i).Key);
                     }
-                    song.MetaInfo.Save();
                 }
+                song.MetaInfo.Save();
+            }
+            else
+            {
+                // Entfernt die Aufgabe, da Ordner kein Liedordner mehr ist
+                LoTasks.Remove(new Task()
+                {
+                    Type = TaskType.FolderNamePattern,
+                    Path = path
+                });
+                DeleteRefsFolders(path, true);
             }
         }
 
         /// <summary>
-        /// Aktionen bei Löschung eines Verzeichnisses oder eines Dokuments.
+        /// Aktionen bei Löschung einer Datei oder eines Verzeichnisses.
         /// </summary>
-        /// <param name="path">Relative Pfadangabe eines Dokuments oder eines Verzeichnisses</param>
+        /// <param name="path">Relative Pfadangabe einer Datei oder eines Verzeichnisses</param>
         public static void DelDirOrFile(string path)
         {
             DeleteRefsWorkList(path);
@@ -167,65 +181,15 @@ namespace Notenverwaltung
         }
 
         /// <summary>
-        /// Gibt eine Liste mit allen zu bearbeitenden Aufgaben zurück und sortiert die Liste nach Typ und Verschachtelungstiefe.
-        /// </summary>
-        /// <param name="loSongFolders">Liste der Ordner, die überprüft werden sollen.</param>
-        public static List<Task> FilterList(List<string> loSongFolders)
-        {
-            CheckFileSystem(loSongFolders);
-
-            string path, filename;
-            List<Task> filteredList = new List<Task>();
-            var sortedList = from task in LoTasks
-                             orderby task.Type descending, task.Path.Split('\\').Length, task.Path
-                             select task;
-
-            foreach (var item in sortedList)
-            {
-                switch (item.Type)
-                {
-                    case TaskType.FileNamePattern:
-                        filename = item.Path.Split('\\').Last();
-                        path = item.Path.Substring(0, item.Path.Length - filename.Length);
-                        break;
-                    case TaskType.FolderNamePattern:
-                        path = item.Path + "\\";
-                        break;
-                    default:
-                        continue;
-                }
-
-                if (loSongFolders.Count != 0 && !loSongFolders.Exists(folder => path.StartsWith(folder)))
-                    continue;
-
-                if (File.Exists(Config.StoragePath + path + "Meta.xml"))
-                {
-                    // remark: Wenn etwas im Dateisystem hinzugefügt oder gelöscht wird, bleibt die Liste gleich
-                    filteredList.Add(item);
-                }
-            }
-
-            return filteredList;
-        }
-
-        /// <summary>
         /// Durchsucht alle Ordner nach PDF-Dateien und Meta.xml, damit in jedem Liedordner eine Meta.xml ist.
         /// Muss eine Meta.xml gelöscht werden, wird eine weitere Methode aufgerufen.
         /// </summary>
-        /// <param name="loSongFolders">Liste der Ordner, die überprüft werden sollen.</param>
-        public static void CheckFileSystem(List<string> loSongFolders)
+        /// <param name="folder">Zu prüfender Pfad.</param>
+        public static void CheckFileSystem(string folder = "")
         {
-            List<string> needMeta = NeedMetaList();
+            List<string> needMeta = NeedMetaList(folder);
 
-            List<string> delMeta = DelMetaList(needMeta);
-
-
-            // Operationen auf angegebene Liedordner beschränken
-            loSongFolders.ForEach(folder =>
-            {
-                needMeta.RemoveAll(path => !folder.StartsWith(path + '\\') && path != folder);
-                delMeta.RemoveAll(path => !folder.StartsWith(path + '\\') && path != folder);
-            });
+            List<string> delMeta = DelMetaList(folder, needMeta);
 
             // Leere Meta.xml in potentiellen Liedordnern erstellen
             Meta meta = new Meta();
@@ -235,29 +199,11 @@ namespace Notenverwaltung
                 meta.Save();
             });
 
-            // Meta.xmls löschen
+            // Meta.xml in Root löschen (ohne Benutzerinformation)
             if (delMeta.Remove(""))
                 DeleteFile(Config.StoragePath + @"\Meta.xml");
+            // Meta.xmls löschen (mit Benutzerinteraktion)
             delMeta.ForEach(path => ConfirmDelMeta(path));
-        }
-
-        /// <summary>
-        /// Überladung der Methode, um das gesamte Dateisystem zu prüfen.
-        /// </summary>
-        public static void CheckFileSystem()
-        {
-            CheckFileSystem(new List<string>());
-        }
-
-        /// <summary>
-        /// Überladung der Methode, um nur nach einem Ordner zu prüfen.
-        /// </summary>
-        /// <param name="songFolder">Zu prüfender Ordner</param>
-        public static void CheckFileSystem(string songFolder)
-        {
-            List<string> list = new List<string>();
-            list.Add(songFolder);
-            CheckFileSystem(list);
         }
 
         #endregion
@@ -276,7 +222,7 @@ namespace Notenverwaltung
 
             for (int i = 0; i < LoTasks.Count; i++)
             {
-                if (LoTasks[i].Path.StartsWith(oldPath))
+                if (LoTasks[i].Path.StartsWith(oldPath + "\\"))
                 {
                     LoTasks[i].Path = newPath + LoTasks[i].Path.Substring(oldPath.Length);
                     ret = true;
@@ -290,31 +236,29 @@ namespace Notenverwaltung
         /// Löscht alle Aufgaben, die sich auf den genannten Pfad oder darunter liegende Elemente beziehen.
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
-        private static void DeleteRefsWorkList(string path)
+        /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag gelöscht werden soll.</param>
+        private static void DeleteRefsWorkList(string path, bool onlyThis = false)
         {
             for (int i = LoTasks.Count - 1; i >= 0; i--)
             {
-                if (LoTasks[i].Path == path || LoTasks[i].Path.StartsWith(path + "\\"))
+                if (LoTasks[i].Path == path || (!onlyThis && LoTasks[i].Path.StartsWith(path + "\\")))
                     LoTasks.RemoveAt(i);
             }
         }
 
         /// <summary>
-        /// Ersetzt in Mappen.xml den alten Pfad mit dem neuen, funktioniert auch nur mit dem Anfang des Pfades.
+        /// Ersetzt in Mappen.xml den alten Pfad durch den neuen, funktioniert auch nur mit dem Anfang des Pfades.
         /// </summary>
         /// <param name="oldPath">Alter zu ersetzender Pfad</param>
         /// <param name="newPath">Neuer Pfad</param>
         private static void ReplaceRefsFolders(string oldPath, string newPath)
         {
+            List<string> loSongFolders = Song.LoadAll();
             List<Folder> folders = Folder.Load();
 
             for (int i = 0; i < folders.Count; i++)
             {
-                for (int j = 0; j < folders[i].Order.Count; j++)
-                {
-                    if (folders[i].Order.ElementAt(j).Value.StartsWith(oldPath))
-                        folders[i].Order.ElementAt(j).Value.Replace(oldPath, newPath);
-                }
+                folders[i].ReplacePath(oldPath, newPath);
             }
 
             Folder.Save(folders);
@@ -324,7 +268,8 @@ namespace Notenverwaltung
         /// Löscht alle Einträge in Mappe.xml, die sich auf den genannten Pfad oder darunter liegende Elemente beziehen.
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
-        private static void DeleteRefsFolders(string path)
+        /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag gelöscht werden soll.</param>
+        private static void DeleteRefsFolders(string path, bool onlyThis = false)
         {
             List<Folder> folders = Folder.Load();
 
@@ -332,13 +277,14 @@ namespace Notenverwaltung
             {
                 for (int j = folders[i].Order.Count - 1; j >= 0; j--)
                 {
-                    if (folders[i].Order.ElementAt(j).Value == path || folders[i].Order.ElementAt(j).Value.StartsWith(path + "\\"))
+                    if (folders[i].Order.ElementAt(j).Value == path || (!onlyThis && folders[i].Order.ElementAt(j).Value.StartsWith(path + "\\")))
                         folders[i].Order.Remove(folders[i].Order.ElementAt(j).Key);
                 }
             }
 
             Folder.Save(folders);
         }
+
 
         /// <summary>
         /// Zeigt eine MessageBox für den Benutzer bzgl. PDF-Dateien, die nicht mit der momentanen Struktur zu vereienen sind, und reagiert auf dessen Eingabe.
@@ -420,30 +366,34 @@ namespace Notenverwaltung
         }
 
         /// <summary>
-        /// Löscht eine Datei, ohne dass eine Exception geworfen wird.
-        /// </summary>
-        /// <param name="path">Pfad der zu löschenden Datei</param>
-        private static void DeleteFile(string path)
-        {
-            try
-            {
-                File.Delete(path);
-            }
-            catch
-            {
-                return;
-            }
-        }
-
-        /// <summary>
         /// Generiert eine Liste von Ordnernamen relativ zum Speicherpfad der Notenverwaltung, welche PDFs enthalten und nach der Definition eines Liedordners eine Meta.xml brauchen.
         /// </summary>
-        private static List<string> NeedMetaList()
+        /// <param name="folder">Zu prüfender Pfad.</param>
+        private static List<string> NeedMetaList(string folder)
         {
-            var allPdfs = from file in Directory.EnumerateFiles(Config.StoragePath, "*.pdf", SearchOption.AllDirectories)
-                          where file.Split('\\').Length > Config.StoragePath.Split('\\').Length
-                          orderby file.Split('\\').Length descending
-                          select file;
+            var allPdfs = Directory.EnumerateFiles(Config.StoragePath + folder, "*.pdf", SearchOption.AllDirectories);
+            Console.WriteLine("AllDirs: " + folder);
+            if (folder != "")
+            {
+                string[] split = folder.Split('\\');
+                string path;
+
+                for (int i = split.Length - 1; i >= 1; i--) // i >= 1, da Rootverzeichnis nicht gescannt werden muss
+                {
+                    path = "";
+                    for (int j = 0; j < i; j++)
+                        path += split[j] + "\\";
+
+                    Console.WriteLine("Pfad: " + path);
+
+                    allPdfs = allPdfs.Concat(Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"));
+                }
+            }
+
+            allPdfs = from file in allPdfs
+                      where file.Split('\\').Length > Config.StoragePath.Split('\\').Length // sortiert Dateien im Rootverzeichnis aus
+                      orderby file.Split('\\').Length descending
+                      select file;
 
             List<string> needMeta = new List<string>();
             string songFolder;
@@ -462,10 +412,27 @@ namespace Notenverwaltung
         /// <summary>
         /// Generiert eine Liste von Ordnernamen relativ zum Speicherpfad der Notenverwaltung, welche eine Meta.xml enthalten, jedoch aufgrund der Dateistruktur keine Liedordner sein können.
         /// </summary>
+        /// <param name="folder">Zu prüfender Pfad.</param>
         /// <param name="needMeta">Liste von Ordnernamen; wird manipuliert, um vorhandene Liedordner aus Liste zu löschen.</param>
-        private static List<string> DelMetaList(List<string> needMeta)
+        private static List<string> DelMetaList(string folder, List<string> needMeta)
         {
-            var allMetas = Directory.EnumerateFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
+            var allMetas = Directory.EnumerateFiles(Config.StoragePath + folder, "Meta.xml", SearchOption.AllDirectories).ToList();
+
+            if (folder != "")
+            {
+                string[] split = folder.Split('\\');
+                string path;
+
+                for (int i = split.Length - 1; i >= 0; i--)
+                {
+                    path = "";
+                    for (int j = 0; j < i; j++)
+                        path += split[j] + "\\";
+
+                    if (File.Exists(Config.StoragePath + path + @"\Meta.xml"))
+                        allMetas.Add(Config.StoragePath + path + @"\Meta.xml");
+                }
+            }
 
             List<string> delMeta = new List<string>();
             string songFolder;
@@ -481,27 +448,81 @@ namespace Notenverwaltung
             return delMeta;
         }
 
-        #endregion
-
-        #region Laden/Speichern
-
-        private static readonly string _Path = @"Worklist.xml";
 
         /// <summary>
-        /// Eventhandler, wenn die Liste verändert wird.
+        /// Normalisiert den Dateinamen und benennt die Datei ggf. um.
         /// </summary>
-        private static void LoTasks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private static string NormalizeFile(string path)
         {
-            XmlHandler.SaveObject(Config.StoragePath + _Path, LoTasks);
+            string filename = path.Split('\\').Last();
+            string name = filename.Substring(0, filename.Length - 4);
+
+            if (!NamePattern.IsNormalizedInstrument(name))
+            {
+                name = NamePattern.NormalizeInstrument(name);
+                if (name == null) // null -> Pattern unbekannt
+                {
+                    LoTasks.Add(new Task()
+                    {
+                        Type = TaskType.FileNamePattern,
+                        Path = path
+                    });
+                }
+                else
+                {
+                    File.Move(Config.StoragePath + path, Config.StoragePath + path.Substring(0, path.Length - filename.Length) + name + ".pdf"); // todo: Exceptionhandling fehlt: Was passiert, wenn neuer Pfad schon vorhanden?
+
+                    return path.Substring(0, path.Length - filename.Length) + name + ".pdf";
+                }
+            }
+
+            return path;
         }
 
         /// <summary>
-        /// Initialisiert die Klassenvariable.
+        /// Normalisiert den Ordnernamen und benennt den Ordner ggf. um.
         /// </summary>
-        private static void Initialize()
+        private static string NormalizeFolder(string path)
         {
-            _LoTasks = XmlHandler.GetObject<ObservableCollection<Task>>(Config.StoragePath + _Path);
-            _LoTasks.CollectionChanged += LoTasks_CollectionChanged;
+            string folderName = path.Split('\\').Last();
+            string newName = folderName;
+
+            if (!NamePattern.IsNormalizedSong(folderName))
+            {
+                newName = NamePattern.NormalizeSong(folderName);
+                if (newName == null) // null -> Pattern unbekannt
+                {
+                    LoTasks.Add(new Task()
+                    {
+                        Type = TaskType.FolderNamePattern,
+                        Path = path
+                    });
+                }
+                else
+                {
+                    Directory.Move(Config.StoragePath + path, Config.StoragePath + path.Substring(0, path.Length - folderName.Length) + newName); // todo: Exceptionhandling fehlt: Was passiert, wenn neuer Pfad schon vorhanden?
+                    
+                    return path.Substring(0, path.Length - folderName.Length) + newName;
+                }
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Löscht eine Datei, ohne dass eine Exception geworfen wird.
+        /// </summary>
+        /// <param name="path">Pfad der zu löschenden Datei</param>
+        private static void DeleteFile(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch
+            {
+                return;
+            }
         }
 
         #endregion

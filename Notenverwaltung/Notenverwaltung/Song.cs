@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Notenverwaltung
 {
@@ -47,9 +47,7 @@ namespace Notenverwaltung
         /// <param name="songFolder">Name des Ordners</param>
         public Song(string songFolder)
         {
-            WorkList.CheckFileSystem(songFolder);
-
-            if (IsValidFolder(songFolder) && File.Exists(Config.StoragePath + songFolder + @"\Meta.xml"))
+            if (File.Exists(Config.StoragePath + songFolder + @"\Meta.xml"))
             {
                 _SongFolder = songFolder;
 
@@ -84,7 +82,7 @@ namespace Notenverwaltung
             }
             else
             {
-                // todo: was passiert, wenn Ordner kein Liedordner nicht vorhanden?
+                // todo: was passiert, wenn Ordner kein Liedordner ist?
             }
         }
 
@@ -97,8 +95,6 @@ namespace Notenverwaltung
         /// </summary>
         public static List<string> LoadAll()
         {
-            WorkList.CheckFileSystem();
-
             List<string> songList = new List<string>();
 
             string[] files = Directory.GetFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
@@ -108,29 +104,10 @@ namespace Notenverwaltung
                 {
                     file = file.Substring(Config.StoragePath.Length, file.Length - Config.StoragePath.Length - 9); // 9 = @"\Meta.xml".Length
 
-                    if (IsValidFolder(file))
-                        songList.Add(file);
+                    songList.Add(file);
                 });
 
             return songList;
-        }
-
-        /// <summary>
-        /// Überprüft, ob der Name ein valider Ordnername ist.
-        /// </summary>
-        public static bool IsValidFolder(string songFolder)
-        {
-            songFolder = songFolder.Split('\\').Last();
-
-            if (songFolder == "")
-                return false;
-
-            string[] result = songFolder.Split('#');
-
-            if (result.Length <= 3)
-                return true;
-
-            return false;
         }
 
         /// <summary>

@@ -135,11 +135,11 @@ namespace Notenverwaltung
         /// </summary>
         public static Instrument GetInstrument(string filename)
         {
-            if (!IsValidFilename(filename))
-                return null;
-
             filename = filename.Split('\\').Last();
             filename = filename.Substring(0, filename.Length - 4);
+
+            if (!NamePattern.IsNormalizedInstrument(filename)) // todo: Was soll bei einem unnormalisierten Namen zurückgegeben werden?
+                return null;
 
             string[] result = filename.Split('#');
 

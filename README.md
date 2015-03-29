@@ -28,6 +28,5 @@ Dieser Ordner ist wie folgt aufgebaut:
  - `Kategorien.xml`: Liste aller Kategorien
  - `Mappen.xml`: Enthält Dictionaries mit Nummer und Musikstück für jede Mappe
  - `NamePatterns.xml`: Enthält weitere Namepatterns für Ordner und PDFs
- - `Worklist.xml`: Speichert offene Aufgaben
 
 Alle XML-Dateien werden versteckt.

@@ -75,22 +75,45 @@ namespace Notenverwaltung
         #endregion
 
         #region Normalisierung
-        // todo: Benutzer soll NamePattern auswählen
 
         /// <summary>
-        /// Normalisiert den eingegebenen Namen mit den bekannten NamePatterns.
+        /// Überprüft, ob der eingegebene Name bereits normalisiert ist.
         /// </summary>
-        public static string NormalizeSong(string source)
+        /// <param name="source">Ordnername ohne Pfad</param>
+        public static bool IsNormalizedSong(string source)
         {
-            return Replace(SongPatterns, source, "${Name}#${Composer}#${Arranger}", '#');
+            string pattern = @"^ (?<Name> [^\#]+) \# (?<Composer> [^\#]*) \# (?<Arranger> [^\#]*) $";
+
+            return Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
         }
 
         /// <summary>
         /// Normalisiert den eingegebenen Namen mit den bekannten NamePatterns.
         /// </summary>
+        /// <param name="source">Ordnername ohne Pfad</param>
+        public static string NormalizeSong(string source)
+        {
+            return IsNormalizedSong(source) ? null : Replace(SongPatterns, source, "${Name}#${Composer}#${Arranger}");
+        }
+
+        /// <summary>
+        /// Überprüft, ob der eingegebene Name (ohne Dateiendung!) bereits normalisiert ist.
+        /// </summary>
+        /// <param name="source">Dokumentname ohne Pfad und Dateiendung</param>
+        public static bool IsNormalizedInstrument(string source)
+        {
+            string pattern = @"^ (?<Name> [a-z-\s]+) (\# (?<Tune> [a-z]+) (\# (?<Num> \d+))? )? $";
+
+            return Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+        }
+
+        /// <summary>
+        /// Normalisiert den eingegebenen Namen (ohne Dateiendung!) mit den bekannten NamePatterns.
+        /// </summary>
+        /// <param name="source">Dokumentname ohne Pfad und Dateiendung</param>
         public static string NormalizeInstrument(string source)
         {
-            return Replace(InstrumentPatterns, source, "${Name}#${Tune}#${Num}", '#');
+            return IsNormalizedSong(source) ? null : Replace(InstrumentPatterns, source, "${Name}#${Tune}#${Num}");
         }
 
         /// <summary>
@@ -99,9 +122,9 @@ namespace Notenverwaltung
         /// <param name="list">Liste mit NamePatterns</param>
         /// <param name="source">Eingabe-String</param>
         /// <param name="replace">Regex-Replace-String</param>
-        /// <param name="split">Trennzeichen</param>
+        /// <param name="trim">Trennzeichen</param>
         /// <returns>Normalisierter String</returns>
-        private static string Replace(ObservableCollection<string> list, string source, string replace, char split)
+        private static string Replace(ObservableCollection<string> list, string source, string replace, char trim = '\0')
         {
             foreach (string pattern in list)
             {
@@ -110,7 +133,7 @@ namespace Notenverwaltung
                     if (Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace))
                     {
                         return Regex.Replace(source, pattern, replace,
-                            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace).TrimEnd(split);
+                            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace).TrimEnd(trim);
                     }
                 }
                 catch

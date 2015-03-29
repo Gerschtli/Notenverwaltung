@@ -69,21 +69,12 @@ namespace Notenverwaltung
             //    }
             //}
 
-            // ***** NamePatterns *****
-            //Console.WriteLine(NamePattern.NormalizeSong("Name&Komponist&Arrangeur"));
-            //Console.WriteLine(NamePattern.NormalizeInstrument("Name&Tune&Num"));
-            //Console.WriteLine(NamePattern.NormalizeInstrument("Name&Tune&5"));
-            //Console.WriteLine(NamePattern.NormalizeSong("Name&Komponist"));
-            //Console.WriteLine(NamePattern.NormalizeInstrument("Name"));
-
             // ***** Watcher *****
+            //WorkList.Initialize();
             //Watcher w = new Watcher();
 
             // ***** WorkList *****
-            //List<string> list = new List<string>();
-            ////list.Add("Lied#Komponist#Arrangeur");
-            //////list.Add("Quintett");
-            //foreach (var item in WorkList.FilterList(list))
+            //foreach (var item in WorkList.LoTasks)
             //{
             //    Console.WriteLine(item.Type + ": " + item.Path);
             //}

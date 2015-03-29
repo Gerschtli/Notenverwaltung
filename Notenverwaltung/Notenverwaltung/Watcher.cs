@@ -32,8 +32,6 @@ namespace Notenverwaltung
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
             string oldName = e.OldFullPath.Substring(Path.Length).TrimStart('\\');
-            Console.WriteLine("{0} umbenannt in {1}", oldName, e.Name);
-
             bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
             WorkList.RenameDirOrFile(oldName, e.Name, dir);
         }
@@ -43,21 +41,21 @@ namespace Notenverwaltung
         /// </summary>
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Console.WriteLine("Datei: " + e.Name + " | ChangeType: " + e.ChangeType);
-            bool dir;
+            if (e.Name.EndsWith(".xml")) // XML-Dateien sollen nicht überwacht werden
+                return;
 
             switch (e.ChangeType)
             {
                 case WatcherChangeTypes.Created:
-                    dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
+                    bool dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
                     WorkList.NewDirOrFile(e.Name, dir);
+                    break;
+                case WatcherChangeTypes.Changed:
+                    if (File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory))
+                        WorkList.ChangeDir(e.Name);
                     break;
                 case WatcherChangeTypes.Deleted:
                     WorkList.DelDirOrFile(e.Name);
-                    break;
-                case WatcherChangeTypes.Changed:
-                    dir = File.GetAttributes(e.FullPath).HasFlag(FileAttributes.Directory);
-                    WorkList.ChangeDirOrFile(e.FullPath, e.Name, dir);
                     break;
             }
         }
