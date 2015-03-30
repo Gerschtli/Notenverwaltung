@@ -183,7 +183,6 @@ namespace Notenverwaltung
                 if (!scale)
                 {
                     pf = _GetPageFormat(form.PointWidth, form.PointHeight);
-                    Console.WriteLine(pf);
 
                     if (pf == PageFormat.A5Landscape)
                     {

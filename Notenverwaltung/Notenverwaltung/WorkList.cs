@@ -372,7 +372,7 @@ namespace Notenverwaltung
         private static List<string> NeedMetaList(string folder)
         {
             var allPdfs = Directory.EnumerateFiles(Config.StoragePath + folder, "*.pdf", SearchOption.AllDirectories);
-            Console.WriteLine("AllDirs: " + folder);
+
             if (folder != "")
             {
                 string[] split = folder.Split('\\');
@@ -383,8 +383,6 @@ namespace Notenverwaltung
                     path = "";
                     for (int j = 0; j < i; j++)
                         path += split[j] + "\\";
-
-                    Console.WriteLine("Pfad: " + path);
 
                     allPdfs = allPdfs.Concat(Directory.EnumerateFiles(Config.StoragePath + path, "*.pdf"));
                 }
