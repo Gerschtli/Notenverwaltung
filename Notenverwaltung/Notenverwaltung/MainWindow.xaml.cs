@@ -20,6 +20,11 @@ namespace Notenverwaltung
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public Watcher Watcher { get; set; }
+
+        public WorkList WorkList { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -70,8 +75,8 @@ namespace Notenverwaltung
             //}
 
             // ***** Watcher *****
-            //WorkList.Initialize();
-            //Watcher w = new Watcher();
+            WorkList = new WorkList();
+            Watcher = new Watcher(WorkList);
 
             // ***** WorkList *****
             //foreach (var item in WorkList.LoTasks)
@@ -79,6 +84,18 @@ namespace Notenverwaltung
             //    Console.WriteLine(item.Type + ": " + item.Path);
             //}
 
+            lvTodos.ItemsSource = WorkList.LoTasks;
+
+            lbCategory.ItemsSource = Categories.Load().Names;
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in WorkList.LoTasks)
+            {
+                Console.WriteLine(item.Type + ": " + item.Path);
+            }
         }
     }
 }

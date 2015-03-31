@@ -9,10 +9,12 @@ namespace Notenverwaltung
     /// </summary>
     public class Watcher : FileSystemWatcher
     {
+        public WorkList WorkList { get; set; }
+
         /// <summary>
         /// Standardkonstruktor zur Initialisierung der richtigen Einstellungen 
         /// </summary>
-        public Watcher()
+        public Watcher(WorkList workList)
             : base(Config.StoragePath)
         {
             this.IncludeSubdirectories = true; // Untersuchung der Unterverzeichnisse
@@ -22,6 +24,7 @@ namespace Notenverwaltung
             this.Created += Watcher_Changed;
             this.Deleted += Watcher_Changed;
             this.EnableRaisingEvents = true;
+            this.WorkList = workList;
         }
 
         #region Event Handler

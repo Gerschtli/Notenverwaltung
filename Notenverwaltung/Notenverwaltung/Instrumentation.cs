@@ -8,10 +8,15 @@ namespace Notenverwaltung
     /// </summary>
     public class Instrumentation
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public List<Instrument> Instruments = new List<Instrument>();
-        
+        public List<Instrument> Instruments { get; set; }
+
+        public Instrumentation()
+        {
+            Instruments = new List<Instrument>();
+        }
+
         #region Speicherung
 
         private static readonly string _Path = @"Besetzungen.xml";

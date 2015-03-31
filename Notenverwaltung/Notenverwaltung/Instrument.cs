@@ -8,11 +8,11 @@ namespace Notenverwaltung
     /// </summary>
     public class Instrument : IEquatable<Instrument>
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public int Num;
+        public int Num { get; set; }
 
-        public string Tune;
+        public string Tune { get; set; }
 
         #region Überschriebene Methoden
 

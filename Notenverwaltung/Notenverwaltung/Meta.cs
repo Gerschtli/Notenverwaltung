@@ -9,15 +9,22 @@ namespace Notenverwaltung
     /// </summary>
     public class Meta
     {
-        public Categories Category = new Categories();
+        public Categories Category { get; set; }
 
-        public Instrumentation OriginalInstrumentation = new Instrumentation();
+        public Instrumentation OriginalInstrumentation { get; set; }
 
         /// <summary>
         /// Verwendung wie folgt:
         /// Da [Key] nicht besetzt ist, nehme [Value] stattdessen.
         /// </summary>
-        public SerializableDictionary<Instrument, Instrument> FallbackInstrumentation = new SerializableDictionary<Instrument,Instrument>();
+        public SerializableDictionary<Instrument, Instrument> FallbackInstrumentation { get; set; }
+
+        public Meta()
+        {
+            Category = new Categories();
+            OriginalInstrumentation = new Instrumentation();
+            FallbackInstrumentation = new SerializableDictionary<Instrument, Instrument>();
+        }
 
         #region Speicherung
 

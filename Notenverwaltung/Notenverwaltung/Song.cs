@@ -27,15 +27,15 @@ namespace Notenverwaltung
             }
         }
 
-        public string Name;
+        public string Name { get; set; }
 
-        public string Composer;
+        public string Composer { get; set; }
 
-        public string Arranger;
+        public string Arranger { get; set; }
 
-        public Meta MetaInfo;
+        public Meta MetaInfo { get; set; }
 
-        public Instrumentation ExInstrumentation = new Instrumentation();
+        public Instrumentation ExInstrumentation { get; set; }
 
         #endregion
 
@@ -70,6 +70,8 @@ namespace Notenverwaltung
 
 
                 string[] files = Directory.GetFiles(Config.StoragePath + songFolder, "*.pdf");
+
+                ExInstrumentation = new Instrumentation();
 
                 Array.ForEach<string>(files,
                     (filename) =>

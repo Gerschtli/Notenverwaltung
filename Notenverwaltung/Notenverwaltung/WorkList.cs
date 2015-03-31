@@ -1,8 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -12,18 +10,20 @@ namespace Notenverwaltung
     /// <summary>
     /// Verwaltet die Liste von Aufgaben, die durch den Watcher erkannt werden und abgearbeitet werden müssen.
     /// </summary>
-    public static class WorkList
+    public class WorkList
     {
         // Diese Liste sollte nicht von außerhalb der Klasse verändert werden.
-        public static List<Task> LoTasks = new List<Task>();
+        public List<Task> LoTasks { get; set; }
 
         #region Öffentliche Funktionen
 
         /// <summary>
         /// Wird zur Initialisierung der Aufgabenliste und vor der Instanzierung des Watchers aufgerufen.
         /// </summary>
-        public static void Initialize()
+        public WorkList()
         {
+            LoTasks = new List<Task>();
+
             CheckFileSystem();
 
             List<string> loSongFolders = Song.LoadAll();
@@ -53,7 +53,7 @@ namespace Notenverwaltung
         /// Aktionen bei Erstellung einer PDF-Datei oder eines Verzeichnisses.
         /// </summary>
         /// <param name="path">relative Pfadangabe einer Datei oder eines Verzeichnisses</param>
-        public static void NewDirOrFile(string path, bool dir)
+        public void NewDirOrFile(string path, bool dir)
         {
             if (dir)
             {
@@ -102,7 +102,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="oldPath">alte relative Pfadangabe eines Verzeichnisses oder einer Datei</param>
         /// <param name="newPath">neue relative Pfadangabe eines Verzeichnisses oder einer Datei</param>
-        public static void RenameDirOrFile(string oldPath, string newPath, bool dir)
+        public void RenameDirOrFile(string oldPath, string newPath, bool dir)
         {
             if (dir)
             {
@@ -140,7 +140,7 @@ namespace Notenverwaltung
         /// Aktionen bei Änderung eines Verzeichnisses oder eines Dokuments.
         /// </summary>
         /// <param name="path">Relative Pfadangabe eines Verzeichnisses</param>
-        public static void ChangeDir(string path)
+        public void ChangeDir(string path)
         {
             if (File.Exists(path + @"\Meta.xml"))
             {
@@ -174,7 +174,7 @@ namespace Notenverwaltung
         /// Aktionen bei Löschung einer Datei oder eines Verzeichnisses.
         /// </summary>
         /// <param name="path">Relative Pfadangabe einer Datei oder eines Verzeichnisses</param>
-        public static void DelDirOrFile(string path)
+        public void DelDirOrFile(string path)
         {
             DeleteRefsWorkList(path);
             DeleteRefsFolders(path);
@@ -185,7 +185,7 @@ namespace Notenverwaltung
         /// Muss eine Meta.xml gelöscht werden, wird eine weitere Methode aufgerufen.
         /// </summary>
         /// <param name="folder">Zu prüfender Pfad.</param>
-        public static void CheckFileSystem(string folder = "")
+        public void CheckFileSystem(string folder = "")
         {
             List<string> needMeta = NeedMetaList(folder);
 
@@ -216,7 +216,7 @@ namespace Notenverwaltung
         /// <param name="oldItem">Altes zu ersetzendes Element</param>
         /// <param name="newItem">Neues Element</param>
         /// <returns>Gibt an, ob das alte Element vorhanden war</returns>
-        private static bool ReplaceRefsWorkList(string oldPath, string newPath)
+        private bool ReplaceRefsWorkList(string oldPath, string newPath)
         {
             bool ret = false;
 
@@ -237,7 +237,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
         /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag gelöscht werden soll.</param>
-        private static void DeleteRefsWorkList(string path, bool onlyThis = false)
+        private void DeleteRefsWorkList(string path, bool onlyThis = false)
         {
             for (int i = LoTasks.Count - 1; i >= 0; i--)
             {
@@ -251,7 +251,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="oldPath">Alter zu ersetzender Pfad</param>
         /// <param name="newPath">Neuer Pfad</param>
-        private static void ReplaceRefsFolders(string oldPath, string newPath)
+        private void ReplaceRefsFolders(string oldPath, string newPath)
         {
             List<string> loSongFolders = Song.LoadAll();
             List<Folder> folders = Folder.Load();
@@ -269,7 +269,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="path">Gelöschter Pfad</param>
         /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag gelöscht werden soll.</param>
-        private static void DeleteRefsFolders(string path, bool onlyThis = false)
+        private void DeleteRefsFolders(string path, bool onlyThis = false)
         {
             List<Folder> folders = Folder.Load();
 
@@ -290,7 +290,7 @@ namespace Notenverwaltung
         /// Zeigt eine MessageBox für den Benutzer bzgl. PDF-Dateien, die nicht mit der momentanen Struktur zu vereienen sind, und reagiert auf dessen Eingabe.
         /// </summary>
         /// <param name="folder">Relative Pfadangabe eines Verzeichnisses, welches eine Meta.xml enthält, die an dieser Stelle nicht erlaubt ist.</param>
-        private static void ConfirmDelMeta(string folder)
+        private void ConfirmDelMeta(string folder)
         {
             /* Fenster für User:
              * Mögliche Problemursachen:
@@ -337,7 +337,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="folder">Potentieller Liedordner</param>
         /// <param name="metaPath">Pfad zur ersten Meta.xml Datei</param>
-        private static List<string> InvalidPdfs(string folder, out string metaPath)
+        private List<string> InvalidPdfs(string folder, out string metaPath)
         {
             string[] split = folder.Split('\\');
             string path;
@@ -369,7 +369,7 @@ namespace Notenverwaltung
         /// Generiert eine Liste von Ordnernamen relativ zum Speicherpfad der Notenverwaltung, welche PDFs enthalten und nach der Definition eines Liedordners eine Meta.xml brauchen.
         /// </summary>
         /// <param name="folder">Zu prüfender Pfad.</param>
-        private static List<string> NeedMetaList(string folder)
+        private List<string> NeedMetaList(string folder)
         {
             var allPdfs = Directory.EnumerateFiles(Config.StoragePath + folder, "*.pdf", SearchOption.AllDirectories);
 
@@ -412,7 +412,7 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="folder">Zu prüfender Pfad.</param>
         /// <param name="needMeta">Liste von Ordnernamen; wird manipuliert, um vorhandene Liedordner aus Liste zu löschen.</param>
-        private static List<string> DelMetaList(string folder, List<string> needMeta)
+        private List<string> DelMetaList(string folder, List<string> needMeta)
         {
             var allMetas = Directory.EnumerateFiles(Config.StoragePath + folder, "Meta.xml", SearchOption.AllDirectories).ToList();
 
@@ -450,7 +450,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Normalisiert den Dateinamen und benennt die Datei ggf. um.
         /// </summary>
-        private static string NormalizeFile(string path)
+        private string NormalizeFile(string path)
         {
             string filename = path.Split('\\').Last();
             string name = filename.Substring(0, filename.Length - 4);
@@ -480,7 +480,7 @@ namespace Notenverwaltung
         /// <summary>
         /// Normalisiert den Ordnernamen und benennt den Ordner ggf. um.
         /// </summary>
-        private static string NormalizeFolder(string path)
+        private string NormalizeFolder(string path)
         {
             string folderName = path.Split('\\').Last();
             string newName = folderName;
@@ -511,7 +511,7 @@ namespace Notenverwaltung
         /// Löscht eine Datei, ohne dass eine Exception geworfen wird.
         /// </summary>
         /// <param name="path">Pfad der zu löschenden Datei</param>
-        private static void DeleteFile(string path)
+        private void DeleteFile(string path)
         {
             try
             {

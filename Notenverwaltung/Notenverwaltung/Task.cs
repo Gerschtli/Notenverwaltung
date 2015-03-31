@@ -21,9 +21,9 @@ namespace Notenverwaltung
     /// </summary>
     public class Task : IEquatable<Task>
     {
-        public TaskType Type = TaskType.Default;
+        public TaskType Type { get; set; }
 
-        public string Path;
+        public string Path { get; set; }
 
         #region Überschriebene Methoden
 

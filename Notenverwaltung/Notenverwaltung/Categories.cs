@@ -8,7 +8,7 @@ namespace Notenverwaltung
     /// </summary>
     public class Categories
     {
-        public List<string> Names;
+        public List<string> Names { get; set; }
 
         #region Speicherung (alle Kategorien)
 

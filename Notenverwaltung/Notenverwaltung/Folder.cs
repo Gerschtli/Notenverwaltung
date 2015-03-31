@@ -9,9 +9,14 @@ namespace Notenverwaltung
     /// </summary>
     public class Folder
     {
-        public string Name;
+        public string Name { get; set; }
 
-        public SerializableDictionary<int, string> Order = new SerializableDictionary<int, string>();
+        public SerializableDictionary<int, string> Order { get; set; }
+
+        public Folder()
+        {
+            Order = new SerializableDictionary<int, string>();
+        }
 
         #region Speicherung
 
