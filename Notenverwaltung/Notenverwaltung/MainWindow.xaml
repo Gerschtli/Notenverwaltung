@@ -5,16 +5,18 @@
         Title="MainWindow" Height="600" Width="1100" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="330"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="330" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="250" />
         </Grid.ColumnDefinitions>
 
+        <!-- Linke TabControl -->
         <TabControl Margin="10">
             <TabItem Header="Mappen">
-                <TreeView Name="trvFolders"> <!-- Oder gruppierte ListView? -->
+                <TreeView Name="trvFolders">
+                    <!-- Oder gruppierte ListView? -->
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type this:Folder}" >
                             <TextBlock Text="{Binding Name}" />
@@ -40,83 +42,100 @@
                 </ListView>
             </TabItem>
         </TabControl>
+        <!-- ENDE Linke TabControl -->
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
 
-        <Grid Grid.Column="2">
+        <!-- Details -->
+        <Grid Grid.Column="2" Name="gSongDetails">
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="5" />
-                <RowDefinition Height="2*" />
+                <RowDefinition Height="265" />
             </Grid.RowDefinitions>
-            
+
+            <!-- Übersicht Instrumentation -->
             <StackPanel Margin="10">
                 <Button Click="Button_Click">Test</Button>
                 <TextBlock>Test Text</TextBlock>
             </StackPanel>
-            
-            <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-            
+            <!-- ENDE Übersicht Instrumentation -->
+
+            <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+            <!-- Musikstück Info -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="35" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+
                     <Grid.Resources>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                            <Setter Property="FontSize" Value="18" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                        </Style>
                         <Style TargetType="{x:Type TextBox}">
                             <Setter Property="VerticalAlignment" Value="Top" />
                             <Setter Property="Padding" Value="3,2" />
+                            <Setter Property="Margin" Value="0,0,0,4" />
                         </Style>
-                        <Style TargetType="{x:Type TextBlock}">
+                        <Style TargetType="{x:Type Label}">
                             <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="Margin" Value="0,4,0,0" />
+                            <Setter Property="Margin" Value="0,-2,0,4" />
                         </Style>
                     </Grid.Resources>
 
                     <WrapPanel Grid.ColumnSpan="2">
-                        <WrapPanel.Resources>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="VerticalAlignment" Value="Top" />
-                                <Setter Property="FontSize" Value="18" />
-                                <Setter Property="FontWeight" Value="SemiBold" />
-                                <Setter Property="Margin" Value="0" />
-                            </Style>
-                        </WrapPanel.Resources>
-                        <TextBlock>Informationen zu </TextBlock>
-                        <TextBlock Text="{Binding SongFolder}"/>
+                        <TextBlock Margin="0,0,5,0">Informationen zu</TextBlock>
+                        <TextBlock Margin="0,0,0,12" Text="{Binding SongFolder}" />
                     </WrapPanel>
 
-                    <TextBlock Grid.Row="1">Name: </TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" />
+                    <Label Grid.Row="1" Content="Name:" Target="{Binding ElementName=tbSongName}" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="tbSongName" Text="{Binding Name}" />
 
-                    <TextBlock Grid.Row="2">Komponist:</TextBlock>
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Composer}" />
+                    <Label Grid.Row="2" Content="Komponist:" Target="{Binding ElementName=tbComposer}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Name="tbComposer" Text="{Binding Composer}" />
 
-                    <TextBlock Grid.Row="3">Arrangeur:</TextBlock>
-                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Arranger}" />
+                    <Label Grid.Row="3" Content="Arrangeur:" Target="{Binding ElementName=tbArranger}" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Name="tbArranger" Text="{Binding Arranger}" />
 
-                    <TextBlock Grid.Row="4">Kategorien:</TextBlock>
+                    <Label Grid.Row="4" Content="Kategorien:" Target="{Binding ElementName=lbCategory}" />
                     <StackPanel Grid.Row="4" Grid.Column="1">
-                        <ListBox Name="lbCategory" Height="100" SelectionMode="Extended" ItemsSource="{Binding Categories}"/>
-                        <WrapPanel>
-                            <TextBox/>
-                        </WrapPanel>
+                        <ListBox Name="lbCategory" Height="97">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Margin="0,2" Content="{Binding}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <DockPanel Margin="0,5,0,0">
+                            <Button DockPanel.Dock="Right" Click="bAddCategory_Click">Hinzufügen</Button>
+                            <TextBox Name="tbNewCategory" Margin="0,0,8,0" />
+                        </DockPanel>
                     </StackPanel>
                 </Grid>
+
             </ScrollViewer>
+            <!-- ENDE Musikstück Info -->
 
         </Grid>
+        <!-- ENDE Details -->
 
-        <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
+        <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" />
 
+        <!-- Vorschau -->
         <DockPanel Grid.Column="4" Margin="10">
             <WrapPanel DockPanel.Dock="Top" HorizontalAlignment="Right">
                 <WrapPanel.Resources>
@@ -132,6 +151,7 @@
                 <WebBrowser></WebBrowser>
             </Border>
         </DockPanel>
+        <!-- ENDE Vorschau -->
 
     </Grid>
 </Window>

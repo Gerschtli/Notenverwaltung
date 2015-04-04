@@ -88,6 +88,10 @@ namespace Notenverwaltung
 
             lbCategory.ItemsSource = Categories.Load().Names;
 
+            var songInfo = new Song("Lied#Komponist#Arrangeur");
+
+            gSongDetails.DataContext = songInfo;
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -95,6 +99,21 @@ namespace Notenverwaltung
             foreach (var item in WorkList.LoTasks)
             {
                 Console.WriteLine(item.Type + ": " + item.Path);
+            }
+        }
+
+        private void bAddCategory_Click(object sender, RoutedEventArgs e)
+        {
+            if (tbNewCategory.Text != "")
+            {
+                Categories allCategories = Categories.Load();
+                if (!allCategories.Names.Exists(name => tbNewCategory.Text == name))
+                {
+                    allCategories.Names.Add(tbNewCategory.Text);
+                    allCategories.Save();
+                    lbCategory.ItemsSource = allCategories.Names;
+                    tbNewCategory.Text = "";
+                }
             }
         }
     }
