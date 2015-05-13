@@ -4,5 +4,6 @@
   <OriginalInstrumentation>
     <Instruments />
   </OriginalInstrumentation>
+  <SongFolder>Lied#Komponist#Arrangeur</SongFolder>
   <FallbackInstrumentation />
 </Meta>

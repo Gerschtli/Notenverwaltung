@@ -31,6 +31,14 @@ namespace Notenverwaltung
             {
                 if (songFolder.StartsWith(startFolder))
                 {
+                    Meta meta = Factory.GetMeta(songFolder);
+                    if (meta.SongFolder != songFolder)
+                    {
+                        Folder.ReplacePathForAll(meta.SongFolder, songFolder, true);
+                        meta.SongFolder = songFolder;
+                        Save.Meta(meta);
+                    }
+
                     newName = NormalizeFolder(songFolder);
 
                     foreach (string file in Directory.EnumerateFiles(Path.Combine(config.StoragePath, newName), "*.pdf"))
@@ -44,7 +52,7 @@ namespace Notenverwaltung
 
             foreach (Folder folder in loFolders)
             {
-                folder.CheckSongs(); // todo: Problematisch, da eine Liedordnerumbenennung, während das Programm nicht geöffnet ist, dazu führt, dass dieser Eintrag gelöscht wird.
+                folder.CheckSongs();
             }
 
             Save.Folders(loFolders);
@@ -121,6 +129,5 @@ namespace Notenverwaltung
                 return newPath;
             }
         }
-
     }
 }

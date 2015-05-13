@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Serialization;
 
 namespace Notenverwaltung
 {
@@ -12,7 +11,6 @@ namespace Notenverwaltung
 
         public Instrumentation OriginalInstrumentation { get; set; }
 
-        [XmlIgnore]
         public string SongFolder { get; set; }
 
         /// <summary>

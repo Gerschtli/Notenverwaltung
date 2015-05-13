@@ -21,10 +21,8 @@ namespace Notenverwaltung
         /// </summary>
         public NamePattern()
         {
-            if (SongPatterns == null)
-                SongPatterns = new ObservableCollection<string>();
-            if (InstrumentPatterns == null)
-                InstrumentPatterns = new ObservableCollection<string>();
+            SongPatterns = new ObservableCollection<string>();
+            InstrumentPatterns = new ObservableCollection<string>();
 
             SongPatterns.CollectionChanged += Patterns_CollectionChanged;
             InstrumentPatterns.CollectionChanged += Patterns_CollectionChanged;

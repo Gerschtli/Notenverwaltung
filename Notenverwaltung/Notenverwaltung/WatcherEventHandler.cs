@@ -70,7 +70,13 @@ namespace Notenverwaltung
                 WorkList.DeleteRefs(oldPath, true);
 
                 if (File.Exists(Path.Combine(Config.StoragePath, String.Format(Config.MetaPath, newPath))))
+                {
                     newPath = new NameNormalizer().NormalizeFolder(newPath);
+
+                    Meta meta = Factory.GetMeta(newPath);
+                    meta.SongFolder = newPath;
+                    Save.Meta(meta);
+                }
 
                 WorkList.ReplaceRefs(oldPath, newPath);
                 Folder.ReplacePathForAll(oldPath, newPath);
@@ -91,8 +97,8 @@ namespace Notenverwaltung
                     if (folder == "")
                         return;
 
-                    if (File.Exists(Path.Combine(Config.StoragePath, String.Format(Config.MetaPath, newPath))))
-                        newPath = new NameNormalizer().NormalizeFolder(newPath);
+                    if (File.Exists(Path.Combine(Config.StoragePath, String.Format(Config.MetaPath, folder))))
+                        newPath = new NameNormalizer().NormalizeFile(newPath);
 
                     if (!oldIsPdf)
                         new FileSystemChecker(folder);
@@ -135,6 +141,7 @@ namespace Notenverwaltung
                     Type = TaskType.FolderNamePattern,
                     Path = path
                 });
+
                 Folder.DeletePathForAll(path, true);
             }
         }

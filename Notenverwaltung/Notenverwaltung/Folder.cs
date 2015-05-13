@@ -43,14 +43,15 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="oldPath">Alter zu ersetzender Pfad</param>
         /// <param name="newPath">Neuer Pfad</param>
-        public void ReplacePath(string oldPath, string newPath)
+        /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag geändert werden soll.</param>
+        public void ReplacePath(string oldPath, string newPath, bool onlyThis = false)
         {
             List<string> loSongFolders = Song.LoadAll();
             string folder;
 
             for (int i = Order.Count - 1; i >= 0; i--)
             {
-                if (Order.ElementAt(i).Value == oldPath || Order.ElementAt(i).Value.StartsWith(oldPath + "\\"))
+                if (Order.ElementAt(i).Value == oldPath || (!onlyThis && Order.ElementAt(i).Value.StartsWith(oldPath + "\\")))
                 {
                     folder = newPath + Order.ElementAt(i).Value.Substring(oldPath.Length);
 
@@ -67,13 +68,14 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="oldPath">Alter zu ersetzender Pfad</param>
         /// <param name="newPath">Neuer Pfad</param>
-        public static void ReplacePathForAll(string oldPath, string newPath)
+        /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag geändert werden soll.</param>
+        public static void ReplacePathForAll(string oldPath, string newPath, bool onlyThis = false)
         {
             List<Folder> folders = Factory.GetFolders();
 
             for (int i = 0; i < folders.Count; i++)
             {
-                folders[i].ReplacePath(oldPath, newPath);
+                folders[i].ReplacePath(oldPath, newPath, onlyThis);
             }
 
             Save.Folders(folders);
