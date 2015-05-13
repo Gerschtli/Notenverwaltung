@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ConfigSerializable xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <StoragePath>.\..\..\..\..\Externer Ordner\</StoragePath>
-</ConfigSerializable>
+<Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <StoragePath>..\..\..\..\Externer Ordner</StoragePath>
+  <CategoriesPath>Kategorien.xml</CategoriesPath>
+  <FoldersPath>Mappen.xml</FoldersPath>
+  <InstrumentationsPath>Besetzungen.xml</InstrumentationsPath>
+  <NamePatternPath>NamePattern.xml</NamePatternPath>
+  <MetaPath>{0}\Meta.xml</MetaPath>
+</Config>

@@ -56,8 +56,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Categories.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Factory.cs" />
+    <Compile Include="FileSystemChecker.cs" />
+    <Compile Include="MTObservableCollection.cs" />
+    <Compile Include="NameNormalizer.cs" />
+    <Compile Include="Save.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Folder.cs" />
     <Compile Include="Instrument.cs" />
@@ -67,9 +71,7 @@
     <Compile Include="PdfWrapper.cs" />
     <Compile Include="Song.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="Watcher.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="WatcherEventHandler.cs" />
     <Compile Include="WorkList.cs" />
     <Compile Include="XmlHandler.cs" />
     <Page Include="MainWindow.xaml">

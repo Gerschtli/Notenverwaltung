@@ -1,51 +1,104 @@
-﻿using System;
-
-namespace Notenverwaltung
+﻿namespace Notenverwaltung
 {
     /// <summary>
-    /// Statische Klasse zum Verwalten von Einstellungsdaten.
+    /// Klasse zum Verwalten von Einstellungsdaten.
     /// </summary>
-    public static class Config
+    public class Config
     {
-        private static readonly string _Path = @"..\..\config.xml";
+        private static Config instance;
 
-        private static string _StoragePath;
-        public static string StoragePath
+        private string storagePath = "";
+        public string StoragePath
         {
-            get
-            {
-                if (_StoragePath == null)
-                    Initialize();
-
-                return _StoragePath;
-            }
+            get { return storagePath; }
             set
             {
-                _StoragePath = value.TrimEnd('\\') + "\\"; // Sicherstellung, dass Pfad mit "\" endet.
+                if (storagePath != "" && value != storagePath)
+                    PropertyChanged();
 
-                var config = new ConfigSerializable()
-                {
-                    StoragePath = _StoragePath
-                };
-
-                XmlHandler.SaveObject(_Path, config);
-            }   
+                storagePath = value;
+            }
         }
 
-        /// <summary>
-        /// Initialisiert die Klassenvariablen.
-        /// </summary>
-        private static void Initialize()
+        private string categoriesPath = "";
+        public string CategoriesPath
         {
-            StoragePath = XmlHandler.GetObject<ConfigSerializable>(_Path).StoragePath;
-        }
-    }
+            get { return categoriesPath; }
+            set
+            {
+                if (categoriesPath != "" && value != categoriesPath)
+                    PropertyChanged();
 
-    /// <summary>
-    /// Instanzierbares Abbild der statischen Klasse. Wird für die Speicherung benötigt.
-    /// </summary>
-    public class ConfigSerializable
-    {
-        public string StoragePath;
+                categoriesPath = value;
+            }
+        }
+
+        private string foldersPath = "";
+        public string FoldersPath
+        {
+            get { return foldersPath; }
+            set
+            {
+                if (foldersPath != "" && value != foldersPath)
+                    PropertyChanged();
+
+                foldersPath = value;
+            }
+        }
+
+        private string instrumentationsPath = "";
+        public string InstrumentationsPath
+        {
+            get { return instrumentationsPath; }
+            set
+            {
+                if (instrumentationsPath != "" && value != instrumentationsPath)
+                    PropertyChanged();
+
+                instrumentationsPath = value;
+            }
+        }
+
+        private string namePatternPath = "";
+        public string NamePatternPath
+        {
+            get { return namePatternPath; }
+            set
+            {
+                if (namePatternPath != "" && value != namePatternPath)
+                    PropertyChanged();
+
+                namePatternPath = value;
+            }
+        }
+
+        private string metaPath = "";
+        public string MetaPath
+        {
+            get { return metaPath; }
+            set
+            {
+                if (value.StartsWith("{0}\\")) // Platzhalter für Ordernamen
+                {
+                    if (metaPath != "" && value != metaPath)
+                        PropertyChanged();
+
+                    metaPath = value;
+                }
+            }
+        }
+
+        public static Config GetInstance()
+        {
+            if (instance == null)
+                instance = Factory.GetConfig();
+
+            return instance;
+        }
+
+        private void PropertyChanged()
+        {
+            Save.Config(this);
+        }
     }
 }

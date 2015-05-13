@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Notenverwaltung
 {
@@ -19,11 +16,35 @@ namespace Notenverwaltung
     /// <summary>
     /// Repräsentiert eine Aufgabe in der Worklist.
     /// </summary>
-    public class Task : IEquatable<Task>
+    public class Task : IEquatable<Task>, INotifyPropertyChanged
     {
-        public TaskType Type { get; set; }
+        private TaskType type;
+        public TaskType Type
+        {
+            get { return type; }
+            set
+            {
+                if (type != value)
+                {
+                    type = value;
+                    NotifyPropertyChanged("Type");
+                }
+            }
+        }
 
-        public string Path { get; set; }
+        private string path;
+        public string Path
+        {
+            get { return path; }
+            set
+            {
+                if (path != value)
+                {
+                    path = value;
+                    NotifyPropertyChanged("Path");
+                }
+            }
+        }
 
         #region Überschriebene Methoden
 
@@ -90,6 +111,18 @@ namespace Notenverwaltung
         public override int GetHashCode()
         {
             return Type.GetHashCode() + Path.GetHashCode();
+        }
+
+        #endregion
+
+        #region PropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
 
         #endregion

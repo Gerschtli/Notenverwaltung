@@ -13,17 +13,19 @@ namespace Notenverwaltung
 
         #region Instanzvariablen
 
-        private string _SongFolder;
+        private Config config;
+
+        private string songFolder;
         public string SongFolder
         {
             get
             {
-                return _SongFolder;
+                return songFolder;
             }
             set
             {
-                _SongFolder = value;
-                MetaInfo.SongFolder = _SongFolder;
+                songFolder = value;
+                MetaInfo.SongFolder = songFolder;
             }
         }
 
@@ -47,9 +49,11 @@ namespace Notenverwaltung
         /// <param name="songFolder">Name des Ordners</param>
         public Song(string songFolder)
         {
-            if (File.Exists(Config.StoragePath + songFolder + @"\Meta.xml"))
+            config = Config.GetInstance();
+
+            if (File.Exists(Path.Combine(config.StoragePath, String.Format(config.MetaPath, songFolder))))
             {
-                _SongFolder = songFolder;
+                this.songFolder = songFolder;
 
                 string[] result = songFolder.Split('\\').Last().Split('#');
 
@@ -66,19 +70,21 @@ namespace Notenverwaltung
                         break;
                 }
 
-                MetaInfo = Meta.Load(songFolder);
+                MetaInfo = Factory.GetMeta(songFolder);
 
 
-                string[] files = Directory.GetFiles(Config.StoragePath + songFolder, "*.pdf");
+                string[] files = Directory.GetFiles(Path.Combine(config.StoragePath, songFolder), "*.pdf");
+                Instrument inst = null;
 
                 ExInstrumentation = new Instrumentation();
 
                 Array.ForEach<string>(files,
                     (filename) =>
                     {
-                        filename = filename.Substring(Config.StoragePath.Length);
+                        filename = filename.Substring(config.StoragePath.Length).Trim('\\');
 
-                        if (Instrument.IsValidFilename(filename))
+                        inst = Instrument.GetInstrument(filename);
+                        if (inst != null)
                             ExInstrumentation.Instruments.Add(Instrument.GetInstrument(filename));
                     });
             }
@@ -98,13 +104,14 @@ namespace Notenverwaltung
         public static List<string> LoadAll()
         {
             List<string> songList = new List<string>();
+            Config config = Config.GetInstance();
 
-            string[] files = Directory.GetFiles(Config.StoragePath, "Meta.xml", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(config.StoragePath, config.MetaPath.Substring(4), SearchOption.AllDirectories);
 
             Array.ForEach<string>(files,
                 (file) =>
                 {
-                    file = file.Substring(Config.StoragePath.Length, file.Length - Config.StoragePath.Length - 9); // 9 = @"\Meta.xml".Length
+                    file = file.Substring(config.StoragePath.Length, file.Length - config.StoragePath.Length - config.MetaPath.Substring(4).Length).Trim('\\');
 
                     songList.Add(file);
                 });
@@ -117,7 +124,8 @@ namespace Notenverwaltung
         /// </summary>
         /// <param name="inst">Benötigte Stimme</param>
         /// <returns>Zu verwendende Stimme oder NULL</returns>
-        public Instrument GetInstrument(Instrument inst) {
+        public Instrument GetInstrument(Instrument inst)
+        {
             if (ExInstrumentation.Instruments.Contains(inst))
                 return inst;
 

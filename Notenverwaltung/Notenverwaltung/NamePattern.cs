@@ -1,7 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace Notenverwaltung
@@ -9,70 +8,35 @@ namespace Notenverwaltung
     /// <summary>
     /// Statische Klasse zum Verwalten aller NamePatterns.
     /// </summary>
-    public static class NamePattern
+    public class NamePattern
     {
+        private static readonly RegexOptions regexOptions = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace;
 
-        #region Klassenvariablen
+        public ObservableCollection<string> SongPatterns { get; set; }
 
-        private static readonly string _Path = @"NamePattern.xml";
-
-        private static ObservableCollection<string> _SongPatterns;
-        public static ObservableCollection<string> SongPatterns
-        {
-            get
-            {
-                if (_SongPatterns == null)
-                    Initialize();
-
-                return _SongPatterns;
-            }
-        }
-
-        private static ObservableCollection<string> _InstrumentPatterns;
-        public static ObservableCollection<string> InstrumentPatterns
-        {
-            get
-            {
-                if (_InstrumentPatterns == null)
-                    Initialize();
-
-                return _InstrumentPatterns;
-            }
-        }
-
-        #endregion
+        public ObservableCollection<string> InstrumentPatterns { get; set; }
 
         /// <summary>
-        /// Initialisiert die Klassenvariablen.
+        /// Setzt den Eventhandler.
         /// </summary>
-        private static void Initialize()
+        public NamePattern()
         {
-            NamePatternSerializable obj = XmlHandler.GetObject<NamePatternSerializable>(Config.StoragePath + _Path);
+            if (SongPatterns == null)
+                SongPatterns = new ObservableCollection<string>();
+            if (InstrumentPatterns == null)
+                InstrumentPatterns = new ObservableCollection<string>();
 
-            _SongPatterns = obj.SongPatterns;
-            _SongPatterns.CollectionChanged += Patterns_CollectionChanged;
-
-            _InstrumentPatterns = obj.InstrumentPatterns;
-            _InstrumentPatterns.CollectionChanged += Patterns_CollectionChanged;
+            SongPatterns.CollectionChanged += Patterns_CollectionChanged;
+            InstrumentPatterns.CollectionChanged += Patterns_CollectionChanged;
         }
-
-        #region Eventhandler
 
         /// <summary>
         /// Eventhandler, wenn die Listen verändert werden.
         /// </summary>
-        private static void Patterns_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Patterns_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var pattern = new NamePatternSerializable()
-            {
-                SongPatterns = _SongPatterns,
-                InstrumentPatterns = _InstrumentPatterns
-            };
-
-            XmlHandler.SaveObject(Config.StoragePath + _Path, pattern);
+            Save.NamePattern(this);
         }
-
-        #endregion
 
         #region Normalisierung
 
@@ -80,40 +44,40 @@ namespace Notenverwaltung
         /// Überprüft, ob der eingegebene Name bereits normalisiert ist.
         /// </summary>
         /// <param name="source">Ordnername ohne Pfad</param>
-        public static bool IsNormalizedSong(string source)
+        public bool IsNormalizedSong(string source)
         {
             string pattern = @"^ (?<Name> [^\#]+) \# (?<Composer> [^\#]*) \# (?<Arranger> [^\#]*) $";
 
-            return Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            return Regex.IsMatch(source, pattern, regexOptions);
         }
 
         /// <summary>
         /// Normalisiert den eingegebenen Namen mit den bekannten NamePatterns.
         /// </summary>
         /// <param name="source">Ordnername ohne Pfad</param>
-        public static string NormalizeSong(string source)
+        public string NormalizeSong(string source)
         {
-            return IsNormalizedSong(source) ? null : Replace(SongPatterns, source, "${Name}#${Composer}#${Arranger}");
+            return IsNormalizedSong(source) ? source : Replace(SongPatterns, source, "${Name}#${Composer}#${Arranger}");
         }
 
         /// <summary>
         /// Überprüft, ob der eingegebene Name (ohne Dateiendung!) bereits normalisiert ist.
         /// </summary>
         /// <param name="source">Dokumentname ohne Pfad und Dateiendung</param>
-        public static bool IsNormalizedInstrument(string source)
+        public bool IsNormalizedInstrument(string source)
         {
             string pattern = @"^ (?<Name> [a-z-\s]+) (\# (?<Tune> [a-z]+) (\# (?<Num> \d+))? )? $";
 
-            return Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+            return Regex.IsMatch(source, pattern, regexOptions);
         }
 
         /// <summary>
         /// Normalisiert den eingegebenen Namen (ohne Dateiendung!) mit den bekannten NamePatterns.
         /// </summary>
         /// <param name="source">Dokumentname ohne Pfad und Dateiendung</param>
-        public static string NormalizeInstrument(string source)
+        public string NormalizeInstrument(string source)
         {
-            return IsNormalizedSong(source) ? null : Replace(InstrumentPatterns, source, "${Name}#${Tune}#${Num}");
+            return IsNormalizedInstrument(source) ? source : Replace(InstrumentPatterns, source, "${Name}#${Tune}#${Num}");
         }
 
         /// <summary>
@@ -124,17 +88,14 @@ namespace Notenverwaltung
         /// <param name="replace">Regex-Replace-String</param>
         /// <param name="trim">Trennzeichen</param>
         /// <returns>Normalisierter String</returns>
-        private static string Replace(ObservableCollection<string> list, string source, string replace, char trim = '\0')
+        private string Replace(IEnumerable<string> list, string source, string replace, char trim = '\0')
         {
             foreach (string pattern in list)
             {
                 try
                 {
-                    if (Regex.IsMatch(source, pattern, RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace))
-                    {
-                        return Regex.Replace(source, pattern, replace,
-                            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace).TrimEnd(trim);
-                    }
+                    if (Regex.IsMatch(source, pattern, regexOptions))
+                        return Regex.Replace(source, pattern, replace, regexOptions).TrimEnd(trim);
                 }
                 catch
                 {
@@ -142,20 +103,9 @@ namespace Notenverwaltung
                 }
             }
 
-            return null;
+            return "";
         }
 
         #endregion
-
-    }
-
-    /// <summary>
-    /// Instanzierbares Abbild der statischen Klasse. Wird für die Speicherung benötigt.
-    /// </summary>
-    public class NamePatternSerializable
-    {
-        public ObservableCollection<string> SongPatterns;
-
-        public ObservableCollection<string> InstrumentPatterns;
     }
 }

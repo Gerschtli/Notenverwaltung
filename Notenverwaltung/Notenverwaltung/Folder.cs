@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Notenverwaltung
@@ -17,28 +16,6 @@ namespace Notenverwaltung
         {
             Order = new SerializableDictionary<int, string>();
         }
-
-        #region Speicherung
-
-        private static readonly string _Path = @"Mappen.xml";
-
-        /// <summary>
-        /// Lädt das gespeicherte Objekt.
-        /// </summary>
-        public static List<Folder> Load()
-        {
-            return XmlHandler.GetObject<List<Folder>>(Config.StoragePath + _Path);
-        }
-
-        /// <summary>
-        /// Speichert die als Parameter angegebene Instanz.
-        /// </summary>
-        public static void Save(List<Folder> folders)
-        {
-            XmlHandler.SaveObject(Config.StoragePath + _Path, folders);
-        }
-
-        #endregion
 
         #region Öffentliche Funktionen
 
@@ -83,6 +60,44 @@ namespace Notenverwaltung
                         Order.Remove(Order.ElementAt(i).Key);
                 }
             }
+        }
+
+        /// <summary>
+        /// Ersetzt in allen Ordner in Order den alten Pfad durch den neuen, funktioniert auch nur mit dem Anfang des Pfades.
+        /// </summary>
+        /// <param name="oldPath">Alter zu ersetzender Pfad</param>
+        /// <param name="newPath">Neuer Pfad</param>
+        public static void ReplacePathForAll(string oldPath, string newPath)
+        {
+            List<Folder> folders = Factory.GetFolders();
+
+            for (int i = 0; i < folders.Count; i++)
+            {
+                folders[i].ReplacePath(oldPath, newPath);
+            }
+
+            Save.Folders(folders);
+        }
+
+        /// <summary>
+        /// Löscht alle Einträge in allen Ordnern, die sich auf den genannten Pfad oder darunter liegende Elemente beziehen.
+        /// </summary>
+        /// <param name="path">Gelöschter Pfad</param>
+        /// <param name="onlyThis">Gibt an, ob nur genau dieser Eintrag gelöscht werden soll.</param>
+        public static void DeletePathForAll(string path, bool onlyThis = false)
+        {
+            List<Folder> folders = Factory.GetFolders();
+
+            for (int i = folders.Count - 1; i >= 0; i--)
+            {
+                for (int j = folders[i].Order.Count - 1; j >= 0; j--)
+                {
+                    if (folders[i].Order.ElementAt(j).Value == path || (!onlyThis && folders[i].Order.ElementAt(j).Value.StartsWith(path + "\\")))
+                        folders[i].Order.Remove(folders[i].Order.ElementAt(j).Key);
+                }
+            }
+
+            Save.Folders(folders);
         }
 
         /// <summary>

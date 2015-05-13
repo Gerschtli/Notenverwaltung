@@ -19,8 +19,6 @@ namespace Notenverwaltung
         /// <summary>
         /// Gleichheitsprüfung über Objekte
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -45,8 +43,6 @@ namespace Notenverwaltung
         /// <summary>
         /// Gleichheitsprüfung mit typisiertem Objekt
         /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
         public bool Equals(Instrument i)
         {
             if (i == null)
@@ -65,9 +61,6 @@ namespace Notenverwaltung
         /// <summary>
         /// Gleichheitsprüfung ==-Operator
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static bool operator ==(Instrument a, Instrument b)
         {
             if (System.Object.ReferenceEquals(a, b)) // Wenn beide Objekte null oder die gleiche Instanz sind -> true
@@ -91,9 +84,6 @@ namespace Notenverwaltung
         /// <summary>
         /// Gleichheitsprüfung !=-Operator
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static bool operator !=(Instrument a, Instrument b)
         {
             return !(a == b);
@@ -102,7 +92,6 @@ namespace Notenverwaltung
         /// <summary>
         /// Überschreiben der GetHashCode Methode
         /// </summary>
-        /// <returns></returns>
         public override int GetHashCode()
         {
             if (Num != 0)
@@ -138,7 +127,7 @@ namespace Notenverwaltung
             filename = filename.Split('\\').Last();
             filename = filename.Substring(0, filename.Length - 4);
 
-            if (!NamePattern.IsNormalizedInstrument(filename)) // todo: Was soll bei einem unnormalisierten Namen zurückgegeben werden?
+            if (!IsValidFilename(filename))
                 return null;
 
             string[] result = filename.Split('#');
@@ -166,7 +155,11 @@ namespace Notenverwaltung
         /// </summary>
         public static bool IsValidFilename(string filename)
         {
-            if (filename == "" || !filename.EndsWith(".pdf"))
+            if (filename == "" || !filename.ToLower().EndsWith(".pdf"))
+                return false;
+
+            NamePattern namePattern = Factory.GetNamePattern();
+            if (!namePattern.IsNormalizedInstrument(filename))
                 return false;
 
             filename = filename.Split('\\').Last();

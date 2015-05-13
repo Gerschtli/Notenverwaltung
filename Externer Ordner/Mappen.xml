@@ -2,23 +2,6 @@
 <ArrayOfFolder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Folder>
     <Name>Übungsordner</Name>
-    <Order>
-      <item>
-        <key>
-          <int>1</int>
-        </key>
-        <value>
-          <string>Lied#Komponist#Arrangeur</string>
-        </value>
-      </item>
-      <item>
-        <key>
-          <int>4</int>
-        </key>
-        <value>
-          <string>Lottchen Polka</string>
-        </value>
-      </item>
-    </Order>
+    <Order />
   </Folder>
 </ArrayOfFolder>

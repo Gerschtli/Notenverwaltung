@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Notenverwaltung
 {
@@ -20,10 +11,9 @@ namespace Notenverwaltung
     /// </summary>
     public partial class MainWindow : Window
     {
+        private FileSystemWatcher watcher;
 
-        public Watcher Watcher { get; set; }
-
-        public WorkList WorkList { get; set; }
+        private WorkList workList;
 
         public MainWindow()
         {
@@ -47,7 +37,7 @@ namespace Notenverwaltung
             //besetzung2.Instruments.Add(new Instrument() { Name = "Horn", Tune = "F" });
             //besetzung2.Instruments.Add(new Instrument() { Name = "Posaune", Tune = "C" });
             //besetzung2.Instruments.Add(new Instrument() { Name = "Tuba", Tune = "C" });
-            //besetzung2.Instruments.Add(new Instrument() { Name = "Susaphon"});
+            //besetzung2.Instruments.Add(new Instrument() { Name = "Susaphon" });
 
             //List<Instrument> x = besetzung.GetMissingInstruments(besetzung2);
             //List<Instrument> y = besetzung.GetNeedlessInstruments(besetzung2);
@@ -75,43 +65,52 @@ namespace Notenverwaltung
             //}
 
             // ***** Watcher *****
-            WorkList = new WorkList();
-            Watcher = new Watcher(WorkList);
+            new FileSystemChecker().CheckStructure();
+            new NameNormalizer().CheckSystem();
+            watcher = Factory.GetWatcher();
 
             // ***** WorkList *****
-            //foreach (var item in WorkList.LoTasks)
+            //foreach (var item in WorkList.GetInstance().LoTasks)
             //{
             //    Console.WriteLine(item.Type + ": " + item.Path);
             //}
 
-            lvTodos.ItemsSource = WorkList.LoTasks;
+            workList = WorkList.GetInstance();
 
-            lbCategory.ItemsSource = Categories.Load().Names;
+            lvTodos.ItemsSource = workList.LoTasks;
+
+            lbCategory.ItemsSource = Factory.GetCategories();
 
             var songInfo = new Song("Lied#Komponist#Arrangeur");
 
             gSongDetails.DataContext = songInfo;
-
         }
 
+        /// <summary>
+        /// Zeigt die aktuelle Worklist in der Konsole.
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var item in WorkList.LoTasks)
+            foreach (var item in workList.LoTasks)
             {
                 Console.WriteLine(item.Type + ": " + item.Path);
             }
         }
 
+        /// <summary>
+        /// Fügt einen Eintrag in die Liste aller Katgorien hinzu.
+        /// </summary>
         private void bAddCategory_Click(object sender, RoutedEventArgs e)
         {
             if (tbNewCategory.Text != "")
             {
-                Categories allCategories = Categories.Load();
-                if (!allCategories.Names.Exists(name => tbNewCategory.Text == name))
+                List<string> allCategories = Factory.GetCategories();
+
+                if (!allCategories.Exists(name => tbNewCategory.Text == name))
                 {
-                    allCategories.Names.Add(tbNewCategory.Text);
-                    allCategories.Save();
-                    lbCategory.ItemsSource = allCategories.Names;
+                    allCategories.Add(tbNewCategory.Text);
+                    Save.Categories(allCategories);
+                    lbCategory.ItemsSource = allCategories;
                     tbNewCategory.Text = "";
                 }
             }

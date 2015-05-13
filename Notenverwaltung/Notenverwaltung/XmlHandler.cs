@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace Notenverwaltung
 {
-    static class XmlHandler // todo: Einkommentieren, damit alle XML-Dateien versteckt werden.
+    public static class XmlHandler // todo: Einkommentieren, damit alle XML-Dateien versteckt werden.
     {
 
         /// <summary>
@@ -23,8 +23,7 @@ namespace Notenverwaltung
                 serializer.Serialize(writer, source);
                 writer.Close();
 
-                //if (!path.Contains("config"))
-                //    File.SetAttributes(path, attributes | FileAttributes.Hidden);
+                //File.SetAttributes(path, attributes | FileAttributes.Hidden);
             }
             catch (Exception e)
             {
@@ -48,8 +47,7 @@ namespace Notenverwaltung
                 TObject obj = (TObject)serializer.Deserialize(reader);
                 reader.Close();
 
-                //if (!path.Contains("config"))
-                //    File.SetAttributes(path, attributes | FileAttributes.Hidden);
+                //File.SetAttributes(path, attributes | FileAttributes.Hidden);
 
                 return obj;
             }
