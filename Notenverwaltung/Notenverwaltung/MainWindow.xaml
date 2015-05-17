@@ -51,12 +51,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="5" />
-                <RowDefinition Height="275" />
+                <RowDefinition Height="305" />
             </Grid.RowDefinitions>
 
             <!-- Übersicht Instrumentation -->
             <StackPanel Margin="10">
-                <Button Click="Button_Click">Test</Button>
+                <Button>Test</Button>
                 <TextBlock>Test Text</TextBlock>
             </StackPanel>
             <!-- ENDE Übersicht Instrumentation -->
@@ -72,6 +72,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -103,28 +104,34 @@
                     </WrapPanel>
 
                     <Label Grid.Row="1" Content="Name:" Target="{Binding ElementName=tbSongName}" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Name="tbSongName" Text="{Binding Name}" />
+                    <TextBox Grid.Row="1" Grid.Column="1" Name="tbSongName" Text="{Binding Name, UpdateSourceTrigger=Explicit}" />
 
                     <Label Grid.Row="2" Content="Komponist:" Target="{Binding ElementName=tbComposer}" />
-                    <TextBox Grid.Row="2" Grid.Column="1" Name="tbComposer" Text="{Binding Composer}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" Name="tbComposer" Text="{Binding Composer, UpdateSourceTrigger=Explicit}" />
 
                     <Label Grid.Row="3" Content="Arrangeur:" Target="{Binding ElementName=tbArranger}" />
-                    <TextBox Grid.Row="3" Grid.Column="1" Name="tbArranger" Text="{Binding Arranger}" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Name="tbArranger" Text="{Binding Arranger, UpdateSourceTrigger=Explicit}" />
 
                     <Label Grid.Row="4" Content="Kategorien:" Target="{Binding ElementName=lbCategory}" />
                     <StackPanel Grid.Row="4" Grid.Column="1">
                         <ListBox Name="lbCategory" Height="100">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox Margin="0,2" Content="{Binding}" />
+                                    <CheckBox Margin="0,2" Content="{Binding Text}" IsChecked="{Binding Checked}" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <DockPanel Margin="0,5,0,0">
-                            <Button DockPanel.Dock="Right" Click="bAddCategory_Click">Hinzufügen</Button>
+                            <Button DockPanel.Dock="Right" Click="bAddCategory_Click" Padding="10,0">Hinzufügen</Button>
                             <TextBox Name="tbNewCategory" Margin="0,0,8,0" />
                         </DockPanel>
                     </StackPanel>
+
+                    <Button Grid.Row="5" Margin="4" Click="bSongInfoSave_Click">Speichern</Button>
+                    <Label Grid.Row="5" Grid.Column="1" Margin="4,1,4,0" Foreground="#a00" Visibility="Hidden" Name="lSongInfoErrorDuplicate">Dieser Name ist bereits vergeben!</Label>
+                    <Label Grid.Row="5" Grid.Column="1" Margin="4,1,4,0" Foreground="#a00" Visibility="Hidden" Name="lSongInfoErrorInput">Ihre Eingaben dürfen keine '#'-Zeichen enthalten!</Label>
+                    <Label Grid.Row="5" Grid.Column="1" Margin="4,1,4,0" Foreground="#a00" Visibility="Hidden" Name="lSongInfoErrorUnknown">Es ist ein Fehler aufgetreten!</Label>
+
                 </Grid>
 
             </ScrollViewer>

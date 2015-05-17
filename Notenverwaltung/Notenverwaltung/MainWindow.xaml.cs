@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 
@@ -15,10 +16,52 @@ namespace Notenverwaltung
 
         private WorkList workList;
 
+        private Song visibleSong;
+
+        /// <summary>
+        /// Initialisiert den Watcher und lädt das UI.
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
 
+            new FileSystemChecker().CheckStructure();
+            new NameNormalizer().CheckSystem();
+            watcher = Factory.GetWatcher();
+
+            workList = WorkList.GetInstance();
+
+            lvTodos.ItemsSource = workList.LoTasks;
+
+            LoadSongInfo(Song.LoadAll()[0]);
+
+            //SoftwareTests();
+        }
+
+        #region Hilfsfunktionen
+
+        /// <summary>
+        /// Lädt die Informationen eines Liedes.
+        /// </summary>
+        /// <param name="songFolder">Liedordner</param>
+        private void LoadSongInfo(string songFolder)
+        {
+            visibleSong = new Song(songFolder);
+            gSongDetails.DataContext = visibleSong;
+
+            List<CheckBoxListItem> list = new List<CheckBoxListItem>();
+
+            foreach (string category in Factory.GetCategories())
+                list.Add(new CheckBoxListItem(category, visibleSong.MetaInfo.Category.Contains(category)));
+
+            lbCategory.ItemsSource = list;
+        }
+
+        /// <summary>
+        /// Hier werden Software Tests gespeichert.
+        /// </summary>
+        private void SoftwareTests()
+        {
             // ---------- Test von Objektcode: ----------
             // *****Stimme - Equals*****
             //Instrumentation besetzung = new Instrumentation { };
@@ -64,38 +107,16 @@ namespace Notenverwaltung
             //    }
             //}
 
-            // ***** Watcher *****
-            new FileSystemChecker().CheckStructure();
-            new NameNormalizer().CheckSystem();
-            watcher = Factory.GetWatcher();
-
             // ***** WorkList *****
             //foreach (var item in WorkList.GetInstance().LoTasks)
             //{
             //    Console.WriteLine(item.Type + ": " + item.Path);
             //}
-
-            workList = WorkList.GetInstance();
-
-            lvTodos.ItemsSource = workList.LoTasks;
-
-            lbCategory.ItemsSource = Factory.GetCategories();
-
-            var songInfo = new Song("Lied#Komponist#Arrangeur");
-
-            gSongDetails.DataContext = songInfo;
         }
 
-        /// <summary>
-        /// Zeigt die aktuelle Worklist in der Konsole.
-        /// </summary>
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var item in workList.LoTasks)
-            {
-                Console.WriteLine(item.Type + ": " + item.Path);
-            }
-        }
+        #endregion
+
+        #region Eventhandler
 
         /// <summary>
         /// Fügt einen Eintrag in die Liste aller Katgorien hinzu.
@@ -109,11 +130,73 @@ namespace Notenverwaltung
                 if (!allCategories.Exists(name => tbNewCategory.Text == name))
                 {
                     allCategories.Add(tbNewCategory.Text);
+                    allCategories.Sort();
                     Save.Categories(allCategories);
-                    lbCategory.ItemsSource = allCategories;
+                    (lbCategory.ItemsSource as List<CheckBoxListItem>).Add(new CheckBoxListItem(tbNewCategory.Text, false));
                     tbNewCategory.Text = "";
                 }
             }
         }
+
+        /// <summary>
+        /// Song Infos speichern.
+        /// </summary>
+        private void bSongInfoSave_Click(object sender, RoutedEventArgs e)
+        {
+            lSongInfoErrorDuplicate.Visibility = Visibility.Hidden;
+            lSongInfoErrorInput.Visibility = Visibility.Hidden;
+            lSongInfoErrorUnknown.Visibility = Visibility.Hidden;
+
+            // Änderung im Namen?
+            string songName = tbSongName.Text,
+                   composer = tbComposer.Text,
+                   arranger = tbArranger.Text,
+                   folderName = String.Format("{0}#{1}#{2}", songName, composer, arranger).Trim('#'),
+                   oldFolderName = visibleSong.SongFolder.Split('\\').Last();
+
+            if (songName.Contains('#') || composer.Contains('#') || arranger.Contains('#'))
+            {
+                lSongInfoErrorInput.Visibility = Visibility.Visible;
+                return;
+            }
+
+            if (folderName != oldFolderName)
+            {
+                int result = visibleSong.MoveFolder(visibleSong.SongFolder.Substring(0, visibleSong.SongFolder.Length - oldFolderName.Length) + folderName);
+
+                if (result == 0)
+                {
+                    visibleSong.Name = songName;
+                    visibleSong.Composer = composer;
+                    visibleSong.Arranger = arranger;
+                }
+                else if (result == 1)
+                {
+                    lSongInfoErrorDuplicate.Visibility = Visibility.Visible;
+                    return;
+                }
+                else if (result == 2)
+                {
+                    lSongInfoErrorUnknown.Visibility = Visibility.Visible;
+                    return;
+                }
+            }
+
+            // Änderung Kategorien?
+            List<CheckBoxListItem> checkBoxList = lbCategory.ItemsSource as List<CheckBoxListItem>;
+            List<string> categories = new List<string>();
+
+            foreach (CheckBoxListItem item in checkBoxList)
+            {
+                if (item.Checked)
+                    categories.Add(item.Text);
+            }
+
+            visibleSong.MetaInfo.Category = categories;
+            Save.Meta(visibleSong.MetaInfo);
+        }
+
+        #endregion
+
     }
 }
