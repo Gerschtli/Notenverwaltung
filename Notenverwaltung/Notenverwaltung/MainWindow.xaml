@@ -25,10 +25,7 @@
                 </TreeView>
             </TabItem>
             <TabItem Header="Lieder">
-                <ListBox>
-                    <ListBoxItem>Lottchen Polka</ListBoxItem>
-                    <ListBoxItem>San Carlo</ListBoxItem>
-                </ListBox>
+                <ListBox Name="lbAllSongs" SelectionChanged="lbAllSongs_SelectionChanged" />
             </TabItem>
             <TabItem Header="Suche" />
             <TabItem Header="Aufgaben" IsEnabled="True">

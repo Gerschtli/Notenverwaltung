@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 
 namespace Notenverwaltung
@@ -31,9 +32,14 @@ namespace Notenverwaltung
 
             workList = WorkList.GetInstance();
 
+            // TabControl Aufgaben
             lvTodos.ItemsSource = workList.LoTasks;
 
-            LoadSongInfo(Song.LoadAll()[0]);
+            // TabControl Lieder + Liedinfo laden
+            List<string> allSongs = Song.LoadAll();
+
+            lbAllSongs.ItemsSource = allSongs;
+            LoadSongInfo(allSongs[0]);
 
             //SoftwareTests();
         }
@@ -194,6 +200,14 @@ namespace Notenverwaltung
 
             visibleSong.MetaInfo.Category = categories;
             Save.Meta(visibleSong.MetaInfo);
+        }
+
+        /// <summary>
+        /// Lied wird in der TabControl ausgewählt.
+        /// </summary>
+        private void lbAllSongs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LoadSongInfo((sender as ListBox).SelectedItem as string);
         }
 
         #endregion
