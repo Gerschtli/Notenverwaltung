@@ -113,6 +113,14 @@ namespace Notenverwaltung
             return Type.GetHashCode() + Path.GetHashCode();
         }
 
+        /// <summary>
+        /// Überschreiben der ToString Methode
+        /// </summary>
+        public override string ToString()
+        {
+            return Path;
+        }
+
         #endregion
 
         #region PropertyChanged

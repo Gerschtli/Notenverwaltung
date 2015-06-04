@@ -17,6 +17,8 @@ namespace Notenverwaltung
 
         private WorkList workList;
 
+        private Task currTask;
+
         private Song visibleSong;
 
         /// <summary>
@@ -33,12 +35,12 @@ namespace Notenverwaltung
             workList = WorkList.GetInstance();
 
             // TabControl Aufgaben
-            lvTodos.ItemsSource = workList.LoTasks;
+            lbTodos.ItemsSource = workList.LoTasks;
 
             // TabControl Lieder + Liedinfo laden
             List<string> allSongs = Song.LoadAll();
 
-            lbAllSongs.ItemsSource = allSongs;
+            lbAllSongs.ItemsSource = allSongs; // todo: Liste aktualisieren, wenn Änderung im Dateisystem
             LoadSongInfo(allSongs[0]);
 
             //SoftwareTests();
@@ -61,6 +63,23 @@ namespace Notenverwaltung
                 list.Add(new CheckBoxListItem(category, visibleSong.MetaInfo.Category.Contains(category)));
 
             lbCategory.ItemsSource = list;
+
+            spTodos.Visibility = Visibility.Hidden;
+            lbTodos.SelectedIndex = -1;
+            gSongDetails.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Lädt die Informationen einer Aufgabe.
+        /// </summary>
+        /// <param name="task">Aufgabe</param>
+        private void LoadTodo(Task task)
+        {
+            currTask = task;
+
+            gSongDetails.Visibility = Visibility.Hidden;
+            lbAllSongs.SelectedIndex = -1;
+            spTodos.Visibility = Visibility.Visible;
         }
 
         /// <summary>
@@ -153,11 +172,25 @@ namespace Notenverwaltung
             lSongInfoErrorInput.Visibility = Visibility.Hidden;
             lSongInfoErrorUnknown.Visibility = Visibility.Hidden;
 
+
+            // Änderung Kategorien?
+            List<CheckBoxListItem> checkBoxList = lbCategory.ItemsSource as List<CheckBoxListItem>;
+            List<string> categories = new List<string>();
+
+            foreach (CheckBoxListItem item in checkBoxList)
+            {
+                if (item.Checked)
+                    categories.Add(item.Text);
+            }
+            visibleSong.MetaInfo.Category = categories;
+
+            Save.Meta(visibleSong.MetaInfo);
+
             // Änderung im Namen?
             string songName = tbSongName.Text,
                    composer = tbComposer.Text,
                    arranger = tbArranger.Text,
-                   folderName = String.Format("{0}#{1}#{2}", songName, composer, arranger).Trim('#'),
+                   folderName = String.Format("{0}#{1}#{2}", songName, composer, arranger),
                    oldFolderName = visibleSong.SongFolder.Split('\\').Last();
 
             if (songName.Contains('#') || composer.Contains('#') || arranger.Contains('#'))
@@ -187,19 +220,6 @@ namespace Notenverwaltung
                     return;
                 }
             }
-
-            // Änderung Kategorien?
-            List<CheckBoxListItem> checkBoxList = lbCategory.ItemsSource as List<CheckBoxListItem>;
-            List<string> categories = new List<string>();
-
-            foreach (CheckBoxListItem item in checkBoxList)
-            {
-                if (item.Checked)
-                    categories.Add(item.Text);
-            }
-
-            visibleSong.MetaInfo.Category = categories;
-            Save.Meta(visibleSong.MetaInfo);
         }
 
         /// <summary>
@@ -207,10 +227,23 @@ namespace Notenverwaltung
         /// </summary>
         private void lbAllSongs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            LoadSongInfo((sender as ListBox).SelectedItem as string);
+            string selectedItem = (sender as ListBox).SelectedItem as string;
+
+            if(selectedItem != null)
+                LoadSongInfo(selectedItem);
+        }
+
+        /// <summary>
+        /// Aufgabe wird in der TabControl ausgewählt.
+        /// </summary>
+        private void lbTodos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Task selectedItem = (sender as ListBox).SelectedItem as Task;
+
+            if (selectedItem != null)
+                LoadTodo(selectedItem);
         }
 
         #endregion
-
     }
 }
