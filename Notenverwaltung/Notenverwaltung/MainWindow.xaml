@@ -3,40 +3,53 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:this="clr-namespace:Notenverwaltung"
         Title="MainWindow" Height="600" Width="1100" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="Header" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Padding" Value="3,2" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,-2,0,4" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="330" />
+            <ColumnDefinition Width="250" />
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="250" />
         </Grid.ColumnDefinitions>
 
         <!-- Linke TabControl -->
-        <TabControl Margin="10">
+        <DockPanel Margin="10">
+            <Button Name="bPrint" DockPanel.Dock="Bottom" Content="Drucken" Margin="0,10,0,0" Padding="0,4" />
+            <TabControl SelectionChanged="TabControl_SelectionChanged">
             
-            <TabItem Header="Mappen">
-                <TreeView Name="trvFolders">
-                    <!-- Oder gruppierte ListView? -->
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type this:Folder}" >
-                            <TextBlock Text="{Binding Name}" />
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-            </TabItem>
+                <TabItem Header="Mappen">
+                    <ListBox Name="lbFolders" SelectionChanged="lbFolders_SelectionChanged" DisplayMemberPath="Name" />
+                </TabItem>
             
-            <TabItem Header="Lieder">
-                <ListBox Name="lbAllSongs" SelectionChanged="lbAllSongs_SelectionChanged" />
-            </TabItem>
+                <TabItem Header="Lieder">
+                    <ListBox Name="lbAllSongs" SelectionChanged="lbAllSongs_SelectionChanged" />
+                </TabItem>
             
-            <TabItem Header="Suche" />
+                <TabItem Header="Suche" />
             
-            <TabItem Header="Aufgaben">
-                <ListBox Name="lbTodos" SelectionChanged="lbTodos_SelectionChanged" />
-            </TabItem>
+                <TabItem Header="Aufgaben">
+                    <ListBox Name="lbTodos" SelectionChanged="lbTodos_SelectionChanged" />
+                </TabItem>
             
-        </TabControl>
+            </TabControl>
+        </DockPanel>
         <!-- ENDE Linke TabControl -->
 
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
@@ -75,27 +88,9 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Grid.Resources>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="FontSize" Value="18" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                            <Setter Property="TextWrapping" Value="Wrap" />
-                        </Style>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="Padding" Value="3,2" />
-                            <Setter Property="Margin" Value="0,0,0,4" />
-                        </Style>
-                        <Style TargetType="{x:Type Label}">
-                            <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="Margin" Value="0,-2,0,4" />
-                        </Style>
-                    </Grid.Resources>
-
                     <WrapPanel Grid.ColumnSpan="2">
-                        <TextBlock Margin="0,0,5,0">Informationen zu</TextBlock>
-                        <TextBlock Margin="0,0,0,12" Text="{Binding SongFolder}" />
+                        <TextBlock Style="{StaticResource Header}" Margin="0,0,5,0">Informationen zu</TextBlock>
+                        <TextBlock Style="{StaticResource Header}" Margin="0,0,0,12" Text="{Binding SongFolder}" />
                     </WrapPanel>
 
                     <Label Grid.Row="1" Content="Name:" Target="{Binding ElementName=tbSongName}" />
@@ -141,25 +136,24 @@
         </StackPanel>
         <!-- ENDE Aufgaben -->
 
-        <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" />
-
-        <!-- Vorschau -->
-        <DockPanel Grid.Column="4" Margin="10">
-            <WrapPanel DockPanel.Dock="Top" HorizontalAlignment="Right">
-                <WrapPanel.Resources>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Height" Value="25" />
-                    </Style>
-                </WrapPanel.Resources>
-                <Button Width="25" Margin="0,0,0,10">+</Button>
-                <Button Width="25" Margin="-1,0,10,10">-</Button>
-                <Button Width="100" Margin="0,0,0,10">Drucken</Button>
-            </WrapPanel>
-            <Border BorderBrush="Gainsboro" BorderThickness="1">
-                <WebBrowser></WebBrowser>
-            </Border>
-        </DockPanel>
-        <!-- ENDE Vorschau -->
-
+        <!-- Mappen -->
+        <StackPanel Grid.Column="2" Name="spFolders" Margin="10" Visibility="Hidden">
+            <TextBlock Style="{StaticResource Header}" Text="Mappe" Margin="0,0,0,12"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="120" />
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding Name}" HorizontalAlignment="Stretch" />
+                <Button Grid.Column="1">Umbenennen</Button>
+            </Grid>
+            <DataGrid ItemsSource="{Binding Order}" AutoGenerateColumns="False"  CanUserAddRows="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Nr." Binding="{Binding Path=Key}" Width="30" SortDirection="Ascending" />
+                    <DataGridTextColumn Header="Titel" Binding="{Binding Path=Value}" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+        <!-- ENDE Mappen -->
     </Grid>
 </Window>

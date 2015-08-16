@@ -21,6 +21,8 @@ namespace Notenverwaltung
 
         private Song visibleSong;
 
+        private Folder currFolder;
+
         /// <summary>
         /// Initialisiert den Watcher und lädt das UI.
         /// </summary>
@@ -43,6 +45,8 @@ namespace Notenverwaltung
             lbAllSongs.ItemsSource = allSongs; // todo: Liste aktualisieren, wenn Änderung im Dateisystem
             LoadSongInfo(allSongs[0]);
 
+            lbFolders.ItemsSource = Factory.GetFolders();
+
             //SoftwareTests();
         }
 
@@ -64,9 +68,7 @@ namespace Notenverwaltung
 
             lbCategory.ItemsSource = list;
 
-            spTodos.Visibility = Visibility.Hidden;
-            lbTodos.SelectedIndex = -1;
-            gSongDetails.Visibility = Visibility.Visible;
+            ChangePanel(gSongDetails);
         }
 
         /// <summary>
@@ -77,9 +79,16 @@ namespace Notenverwaltung
         {
             currTask = task;
 
-            gSongDetails.Visibility = Visibility.Hidden;
-            lbAllSongs.SelectedIndex = -1;
-            spTodos.Visibility = Visibility.Visible;
+            ChangePanel(spTodos);
+        }
+
+        private void LoadFolder(int index)
+        {
+            currFolder = Factory.GetFolders()[index];
+
+            spFolders.DataContext = currFolder;
+
+            ChangePanel(spFolders);
         }
 
         /// <summary>
@@ -137,6 +146,15 @@ namespace Notenverwaltung
             //{
             //    Console.WriteLine(item.Type + ": " + item.Path);
             //}
+        }
+
+        private void ChangePanel(Panel panel)
+        {
+            gSongDetails.Visibility = Visibility.Hidden;
+            spTodos.Visibility = Visibility.Hidden;
+            spFolders.Visibility = Visibility.Hidden;
+
+            panel.Visibility = Visibility.Visible;
         }
 
         #endregion
@@ -242,6 +260,40 @@ namespace Notenverwaltung
 
             if (selectedItem != null)
                 LoadTodo(selectedItem);
+        }
+
+        /// <summary>
+        /// Aufgabe wird in der TabControl ausgewählt.
+        /// </summary>
+        private void lbFolders_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int selectedIndex = (sender as ListBox).SelectedIndex;
+
+            if (selectedIndex != -1)
+                LoadFolder(selectedIndex);
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = (sender as TabControl).SelectedIndex;
+
+            switch (index)
+            {
+                case 0:
+                    ChangePanel(spFolders);
+                    break;
+                case 1:
+                    ChangePanel(gSongDetails);
+                    break;
+                case 2:
+                    ChangePanel(spFolders);
+                    break;
+                case 3:
+                    ChangePanel(spTodos);
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion
