@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="Storage.View.Navigation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:viewModel="clr-namespace:Storage.ViewModel"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="250" d:DataContext="{d:DesignInstance viewModel:MainViewModel}">
+
+    <DockPanel Margin="10">
+
+        <DockPanel.Resources>
+            <CollectionViewSource x:Key="Directories"
+                                  Source="{Binding Directories}">
+
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="Type" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+        </DockPanel.Resources>
+
+        <Button DockPanel.Dock="Bottom" Content="Drucken" Margin="0,10,0,0" Padding="0,4" />
+
+        <TabControl>
+            <TabItem Header="Lieder">
+
+                <ListBox ItemsSource="{Binding DirectoriesSongs}"
+                         SelectedItem="{Binding SelectedDirectory}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SelectDirectory}"
+                                                   CommandParameter="{Binding SelectedDirectory}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="viewModel:IDirectoryListItem">
+                            <WrapPanel>
+                                <TextBlock Text="{Binding DisplayText}" />
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+
+            </TabItem>
+            <TabItem Header="Aufgaben">
+
+                <ListBox ItemsSource="{Binding DirectoriesTasks}"
+                         SelectedItem="{Binding SelectedDirectory}">
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SelectDirectory}"
+                                                   CommandParameter="{Binding SelectedDirectory}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+
+                    <ListBox.GroupStyle>
+                        <GroupStyle />
+                    </ListBox.GroupStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="viewModel:IDirectoryListItem">
+                            <WrapPanel>
+                                <TextBlock Text="{Binding DisplayText}" />
+                            </WrapPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+
+            </TabItem>
+        </TabControl>
+
+    </DockPanel>
+
+</UserControl>

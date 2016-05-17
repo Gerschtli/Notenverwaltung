@@ -1,0 +1,4 @@
+<DirectoryData xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Storage.Model">
+  <Song i:nil="true" />
+  <Status>UNKNOWN</Status>
+</DirectoryData>

@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="Storage.View.DirectoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModel="clr-namespace:Storage.ViewModel"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="850" d:DataContext="{d:DesignInstance viewModel:DirectoryViewModel}">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Style="{StaticResource Header}">Enthält folgender Ordner ein Lied?</TextBlock>
+        <TextBlock Grid.Row="1" Margin="0,0,0,10" Text="{Binding DisplayText}" />
+
+        <WrapPanel Grid.Row="2" Margin="0,0,0,10">
+            <RadioButton Content="Ja" Margin="0,0,20,0" IsChecked="{Binding IsSong}" />
+            <RadioButton Content="Nein" IsChecked="True" />
+        </WrapPanel>
+
+        <Button Grid.Row="3" Margin="4" Width="100" HorizontalAlignment="Left" Command="{Binding Save}">
+            Speichern
+        </Button>
+
+    </Grid>
+
+</UserControl>

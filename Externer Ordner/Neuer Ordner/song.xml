@@ -1,0 +1,24 @@
+<DirectoryData xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.datacontract.org/2004/07/Storage.Model">
+  <Song>
+    <Arranger i:nil="true" />
+    <Categories i:nil="true" />
+    <Composer>dsaxx</Composer>
+    <FallbackInstruments xmlns:d3p1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+      <d3p1:KeyValueOfInstrumentInstrumentmKUAYkMG>
+        <d3p1:Key>
+          <Name>Trompete</Name>
+          <Number>0</Number>
+          <Tune i:nil="true" />
+        </d3p1:Key>
+        <d3p1:Value>
+          <Name>Bass</Name>
+          <Number>0</Number>
+          <Tune i:nil="true" />
+        </d3p1:Value>
+      </d3p1:KeyValueOfInstrumentInstrumentmKUAYkMG>
+    </FallbackInstruments>
+    <Instruments i:nil="true" />
+    <Name>Bla Test</Name>
+  </Song>
+  <Status>SONG</Status>
+</DirectoryData>
